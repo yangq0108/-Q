@@ -398,6 +398,100 @@
   }
   .deepdive-links a:hover { background: #dbeafe; }
 
+  /* 인지세·국민주택채권 매입기준율표처럼 구간별 수치를 나열하는 정보를 긴 문장 대신 표로 보여준다 */
+  .dd-table-wrap { margin-bottom: 18px; }
+  .dd-table-wrap:last-child { margin-bottom: 4px; }
+  .dd-table-title { font-size: 12px; font-weight: 700; color: var(--primary, #1d4ed8); margin-bottom: 6px; }
+  .dd-table-scroll { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
+  table.dd-table { width: 100%; border-collapse: collapse; font-size: 12.5px; white-space: nowrap; }
+  table.dd-table th, table.dd-table td { padding: 7px 10px; border-bottom: 1px solid #f1f5f9; }
+  table.dd-table th:first-child, table.dd-table td:first-child { text-align: left; white-space: normal; }
+  table.dd-table thead th { background: #eff6ff; color: #1d4ed8; font-weight: 700; text-align: right; }
+  table.dd-table thead th:first-child { text-align: left; }
+  table.dd-table td { text-align: right; color: #334155; }
+  table.dd-table td:first-child { color: #0f172a; font-weight: 500; }
+  table.dd-table tbody tr:last-child td { border-bottom: none; }
+  table.dd-table tbody tr:hover td { background: #f8fafc; }
+  .dd-table-note { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.5; }
+
+  /* 거래금액·시가표준액을 입력하면 인지세·채권매입액을 바로 계산해주는 미니 계산기 */
+  .dd-calc {
+    border: 1px solid #bfdbfe;
+    background: var(--primary-container, #eff6ff);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .dd-calc-title { font-size: 12.5px; font-weight: 700; color: var(--primary, #1d4ed8); margin-bottom: 10px; }
+  .dd-calc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .dd-calc-row:last-of-type { margin-bottom: 0; }
+  .dd-calc-row label { font-size: 12.5px; color: #334155; flex-shrink: 0; width: 92px; }
+  .dd-calc-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 0 10px;
+  }
+  .dd-calc-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 8px 0;
+    font-size: 13.5px;
+    font-family: inherit;
+    min-width: 0;
+    text-align: right;
+  }
+  .dd-calc-unit { font-size: 12.5px; color: #64748b; flex-shrink: 0; }
+  .dd-calc-select {
+    flex: 1;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    font-family: inherit;
+    background: #fff;
+    color: #0f172a;
+  }
+  .dd-calc-result {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #bfdbfe;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .dd-calc-result b { display: block; font-size: 18px; color: #0f172a; margin-bottom: 2px; }
+  .dd-calc-sub { display: block; font-size: 12px; color: #64748b; }
+
+  /* 1100px 미만(모바일 포함)에서는 오른쪽 고정 사이드바 대신, 눌렀을 때만 뜨는 바텀시트 모달로 보여준다.
+     그냥 본문 아래에 이어붙이면 페이지 맨 밑까지 스크롤해야 보여서 모바일에서 "먹통"처럼 느껴지기 때문. */
+  @media (max-width: 1099.98px) {
+    .detail-rail { display: none; }
+    .detail-rail.dd-open {
+      display: flex;
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      align-items: flex-end;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.45);
+      margin: 0;
+      padding: 0;
+    }
+    .detail-rail.dd-open .detail-card {
+      width: 100%;
+      max-width: 560px;
+      max-height: min(80vh, 640px);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.28);
+    }
+  }
+
   /* 잔금날 흐름 등 "장소 이동"을 보여주는 아이콘 타임라인 (사이트 화면을 흉내내지 않는 순수 도식만 유지) */
   .mock-timeline { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-start; }
   .mock-timeline .stop { flex: 1; min-width: 68px; text-align: center; }
@@ -543,27 +637,26 @@ const REGISTRATION_TYPES = [
       { key: "seller", label: "매도인 관련 서류" },
       { key: "buyer", label: "매수인 관련 서류" },
       { key: "loan", label: "대출 관련 서류" },
-      { key: "tenant", label: "임차인 승계 관련 서류" },
       { key: "tax", label: "세금·비용 관련 서류" },
       { key: "form", label: "등기신청서" }
     ],
     baseDocuments: [
       { id: "sale-contract", label: "부동산 매매계약서 원본", category: "common" },
       { id: "sale-report", label: "부동산거래계약 신고필증", category: "common", note: "부동산거래관리시스템(rtms.molit.go.kr)에서 발급. 공인중개사가 이미 신고를 마쳐둔 경우가 많아 매수인은 로그인 후 '부동산거래신고 이력조회'에서 조회·인쇄(2부)만 하면 되는 경우가 대부분" },
-      { id: "family-cert", label: "가족관계증명서(상세)", category: "buyer", note: "대법원 전자가족관계등록시스템(efamily.scourt.go.kr)에서 발급. e-Form 공식 첨부서류 목록엔 없지만 사례에 따라 요구되기도 하니 미리 준비해두면 안전 (상세증명서·전부공개로 발급)" },
-      { id: "land-register", label: "토지대장", category: "property", note: "정부24(gov.kr)에서 '토지(임야)대장등본발급(대지권등록부)'로 발급" },
-      { id: "building-register", label: "건축물대장", category: "property", note: "정부24(gov.kr)에서 발급 (집합건물은 대장구분 '집합' · 대장종류 '전유부'로 발급)" },
-      { id: "registry-cert-latest", label: "등기사항전부증명서(등기부등본) 최신본", category: "property", note: "잔금일 직전 재발급하여 권리관계 최종 확인" },
+      { id: "family-cert", label: "가족관계증명서(상세)", category: "buyer", note: "대법원 전자가족관계등록시스템(efamily.scourt.go.kr)에서 발급. e-Form 공식 첨부서류 목록엔 없지만 사례에 따라 요구되기도 하니 미리 준비해두면 안전 (상세증명서·전부공개로 발급). 발급일로부터 3개월 이내여야 함" },
+      { id: "land-register", label: "토지대장", category: "property", note: "정부24(gov.kr)에서 '토지(임야)대장등본발급(대지권등록부)'로 발급. 부동산등기규칙상 발급일로부터 3개월 이내여야 하므로 등기 접수일에 임박해 발급" },
+      { id: "building-register", label: "건축물대장", category: "property", note: "정부24(gov.kr)에서 발급 (집합건물은 대장구분 '집합' · 대장종류 '전유부'로 발급). 토지대장과 마찬가지로 발급일로부터 3개월 이내여야 함" },
+      { id: "registry-cert-latest", label: "등기사항전부증명서(등기부등본) 최신본", category: "property", note: "법령상 정해진 유효기간은 없으나, 최신 권리관계 확인이 목적이므로 잔금일 직전(가능하면 당일) 재발급하여 권리관계 최종 확인" },
       { id: "seller-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "seller", note: "분실 시 재발급이 안 되므로 등기소 동행 등 별도 확인 절차가 필요할 수 있음" },
-      { id: "seller-seal-cert", label: "인감증명서 (매도용)", category: "seller", note: "매수인 인적사항이 기재된 '부동산 매도용'으로 발급 요청. 인감도장과 도장이 일치하는지, 매수인 인적사항이 맞는지 잔금일 현장에서 대조" },
+      { id: "seller-seal-cert", label: "인감증명서 (매도용)", category: "seller", note: "매수인 인적사항이 기재된 '부동산 매도용'으로 발급 요청. 인감도장과 도장이 일치하는지, 매수인 인적사항이 맞는지 잔금일 현장에서 대조. 발급일로부터 3개월 이내여야 함" },
       { id: "seller-abstract", label: "주민등록초본", category: "seller", note: "3개월 이내 발급, 주소 변동 이력 포함·주민등록번호 전체 표시로 발급. '계약서상 주소 = 초본 마지막 주소 = 인감증명서 주소 = 위임장 위임인 주소 = 등기신청서 의무자 주소'가 모두 일치해야 함" },
       { id: "seller-seal-stamp", label: "인감도장 날인 서류 일체", category: "seller" },
-      { id: "buyer-resident-doc", label: "주민등록등본(또는 초본)", category: "buyer" },
+      { id: "buyer-resident-doc", label: "주민등록등본(또는 초본)", category: "buyer", note: "발급일로부터 3개월 이내여야 함" },
       { id: "buyer-id", label: "신분증, 도장", category: "buyer" },
       { id: "acquisition-tax-receipt", label: "취득세 납부영수증", category: "tax", note: "서울은 이택스(etax.seoul.go.kr)/STAX 앱, 그 외 지역은 위택스(wetax.go.kr)/스마트위택스 앱에서 신고·납부. 지방세는 카드 납부 수수료가 없어 카드사 무이자 할부 이벤트를 활용하면 유리" },
-      { id: "national-housing-bond", label: "국민주택채권 매입(및 즉시매도) 영수증", category: "tax", note: "부동산공시가격 알리미(realtyprice.kr)에서 공시가격 확인 후 주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입. 대부분 매입과 동시에 즉시매도(할인)해 차액만 부담하며, 공동명의는 지분대로 나눠 2건으로 매입. 채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로 잔금일 당일이나 그 이후(등기신청 전까지) 매입하는 것이 원칙 — 며칠씩 미리 매입할 필요는 없고, 매년 4~5월경 공동주택가격이 새로 고시되니 그 시기와 잔금일이 겹치면 최신 공시가격 반영 여부를 재확인" },
+      { id: "national-housing-bond", label: "국민주택채권 매입(및 즉시매도) 영수증", category: "tax", note: "부동산공시가격 알리미(realtyprice.kr)에서 공시가격 확인 후 주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입. 대부분 매입과 동시에 즉시매도(할인)해 차액(고객부담금)만 부담하며, 공동명의는 지분대로 나눠 2건으로 매입. 채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로 잔금일 당일이나 그 이후(등기신청 전까지) 매입하는 것이 원칙 — 며칠씩 미리 매입할 필요는 없고, 매년 4~5월경 공동주택가격이 새로 고시되니 그 시기와 잔금일이 겹치면 최신 공시가격 반영 여부를 재확인. 매입기준율표와 고객부담금 계산 예시는 '국민주택채권 매입' 단계의 자세히 보기 참고" },
       { id: "registration-fee", label: "등기신청수수료 납부 영수증", category: "tax", note: "대법원 인터넷등기소(iros.go.kr)에서 전자납부. e-Form(전자표준양식) 기준 13,000원이며, 영수증은 납부일로부터 14일간만 유효" },
-      { id: "gov-revenue-stamp", label: "전자수입인지(인지세)", category: "tax", note: "전자수입인지(e-revenuestamp.or.kr)에서 거래금액에 따른 세액을 구매·출력 (예: 1억~10억 15만원, 10억 초과 35만원 — 정확한 금액은 사이트에서 재확인). 프린터 직접 연결 필요, 단 1회만 출력 가능, 구매 후 취소 불가(우체국·금융회사 환매만 가능). 공동명의여도 총액 기준 1장만 구매. 세액은 계약서상 거래금액만으로 정해지므로 잔금일을 기다릴 필요 없이 계약 체결 직후부터 등기신청 전까지 아무 때나 미리 구매·출력해도 무방" },
+      { id: "gov-revenue-stamp", label: "전자수입인지(인지세)", category: "tax", note: "전자수입인지(e-revenuestamp.or.kr)에서 거래금액에 따른 세액을 구매·출력 (세액 구간표는 '전자수입인지 구매' 단계의 자세히 보기 참고). 프린터 직접 연결 필요, 단 1회만 출력 가능, 구매 후 취소 불가(우체국·금융회사 환매만 가능). 공동명의여도 총액 기준 1장만 구매. 세액은 계약서상 거래금액만으로 정해지므로 잔금일을 기다릴 필요 없이 계약 체결 직후부터 등기신청 전까지 아무 때나 미리 구매·출력해도 무방" },
       { id: "registration-form", label: "소유권이전등기신청서", category: "form", note: "대법원 인터넷등기소(iros.go.kr) 'e-Form' 작성 프로그램으로 작성·출력" },
       { id: "poa-form", label: "등기신청 위임장", category: "form", note: "매수인이 등기소에 직접 접수할 때 매도인의 위임을 증명하는 서류. 매도인 인감도장 날인이 필수이므로, 잔금날 실수에 대비해 여분 1부를 더해 총 2부를 준비해두는 것을 권장" }
     ],
@@ -583,6 +676,7 @@ const REGISTRATION_TYPES = [
       ]},
       { id: "s2b", title: "전자수입인지 구매", description: "매매계약서에 첨부할 인지세를 전자수입인지로 구매·출력한다. (거래금액만 정해지면 계산되므로 계약 직후 언제든 미리 해둬도 무방)", details: [
         "인지세는 거래금액에만 좌우되는 세금이라 잔금일을 기다릴 이유가 없다 — 계약서 작성 직후부터 등기신청서 제출 전까지 아무 때나 구매·출력해두면 되고, 미리 해두면 잔금일 일정에 여유가 생긴다.",
+        "세액은 거래금액 구간별 정액(1천만원 미만 면제 ~ 10억원 초과 35만원, 6단계)이다 — 정확한 구간표는 '자세히 보기'에서 확인.",
         "전자수입인지(e-revenuestamp.or.kr) → '종이문서용 전자수입인지' → 비회원 서비스에서 '인지세 과세문서 안내'로 거래금액에 맞는 세액을 먼저 확인한다.",
         "'인지세 납부' → '부동산 등 소유권 이전' 항목에 조회한 세액을 입력해 구매한다 (거래금액이 아니라 '세액'을 입력).",
         "프린터가 직접 연결된 PC에서만 출력되고 딱 1번만 인쇄할 수 있으며, 구매 후 취소가 안 되니(우체국·금융회사 환매만 가능) 출력 전 테스트출력으로 미리 확인한다.",
@@ -590,11 +684,22 @@ const REGISTRATION_TYPES = [
       ], checklist: [
         "출력한 전자수입인지 보관 — 등기소 접수 시 매매계약서에 첨부해 제출한다"
       ], deepDive: {
+        calculators: [{ id: "sale-stamp", kind: "stamp" }],
+        tables: [
+          { title: "인지세 세액표 (거래금액 기준)", headers: ["거래금액", "세액"], rows: [
+            ["1천만원 미만", "면제"],
+            ["1천만원 초과 ~ 3천만원 이하", "2만원"],
+            ["3천만원 초과 ~ 5천만원 이하", "4만원"],
+            ["5천만원 초과 ~ 1억원 이하", "7만원"],
+            ["1억원 초과 ~ 10억원 이하", "15만원"],
+            ["10억원 초과", "35만원"]
+          ], note: "인지세법 개정 가능성이 있으니 구매 전 사이트의 '인지세 과세문서 안내'에서 최종 확인." }
+        ],
         list: [
           "① 사이트 접속 → '종이문서용 전자수입인지' 클릭",
           "② 좌측 하단 '비회원 서비스' 클릭 → 개인정보 수집·이용 동의 체크 → 확인",
           "③ 비회원 로그인 확인 후 '구매' 클릭",
-          "④ '인지세 과세문서 안내' 메뉴에서 거래금액 구간별 세액을 미리 확인 (틀린 금액으로 사면 환불이 어려우니 꼭 확인)",
+          "④ '인지세 과세문서 안내' 메뉴에서 거래금액에 맞는 세액을 위 표에서 확인 (틀린 금액으로 사면 환불이 어려우니 사이트에서 한 번 더 재확인)",
           "⑤ '인지세 납부' → '1. 부동산 등 소유권 이전' 선택 → 금액란에 확인한 '세액'을 입력(거래금액이 아님) → 건수 '1' → 확인",
           "⑥ '테스트출력'을 먼저 눌러 프린터가 정상 연결됐는지 확인한 뒤 결제방법을 선택해 결제",
           "⑦ 사이트 메인 → '발급' 메뉴에서 실제 인지 출력 (여기서 진짜 1번만 인쇄됨)"
@@ -610,6 +715,8 @@ const REGISTRATION_TYPES = [
       ]},
       { id: "s5", title: "국민주택채권 매입", description: "공시가격 기준으로 채권을 매입하고 즉시 매도(할인)한다. (원칙적으로 잔금일 당일~등기신청 전 사이에 매입)", details: [
         "채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로, 원칙적으로 잔금일 당일이나 그 이후(등기신청 전까지) 매입한다 — 미리 며칠씩 앞당겨 살 필요는 없다. 다만 매년 4월 말~5월 말경 공동주택가격이 새로 고시되니, 잔금일이 이 시기와 겹친다면 최신 공시가격이 반영됐는지 다시 확인한다.",
+        "채권매입금액 = 시가표준액(공시가격) × 매입률로 정해지며, 지역·금액 구간별 매입률표는 '자세히 보기'에서 확인할 수 있다.",
+        "매입과 동시에 즉시매도하면 매입금액 전액이 아니라 그중 일부인 '고객부담금'만 실제로 내면 된다 — 고객부담금 = 매입금액 × 그날의 채권 할인율이며, 이 할인율은 매일 바뀐다(주택도시기금 '고객부담금 조회하기' 또는 은행 채권 할인율 조회에서 당일 확인). 참고로 2026년 9월 초 기준 할인율은 15%대였으므로, 매입금액이 1,300만원이라면 그 시점 기준 고객부담금은 약 200만원 수준이었다 — 어디까지나 예시일 뿐 매입 당일 실제 할인율로 다시 계산해야 한다.",
         "부동산공시가격 알리미(realtyprice.kr)에서 해당 부동산의 최신 공동주택가격(공시가격)을 확인해둔다.",
         "주택도시기금(nhuf.molit.go.kr) → '청약/채권' → '셀프 채권매입 도우미'에서 확인해둔 공시가격으로 채권매입금액을 조회한다.",
         "채권 거래는 즉시매입 기준 영업일 17:30까지만 가능하며, 국민은행은 예약매입(18:00~23:30, 토·공휴일 23:30까지)도 지원해 퇴근 후에도 매입할 수 있다.",
@@ -618,6 +725,17 @@ const REGISTRATION_TYPES = [
       ], checklist: [
         "채권매입 영수증(발행번호 포함, 공동명의는 2장) 보관 — 뒤에 e-Form '수수료등 입력'과 등기소 제출 서류로 쓴다"
       ], deepDive: {
+        calculators: [{ id: "sale-bond", kind: "bond-paid" }],
+        tables: [
+          { title: "매입기준율표 — 매매 등 유상 소유권이전(주택)", headers: ["시가표준액", "서울·광역시", "그 외 지역"], rows: [
+            ["2천만원 이상 ~ 5천만원 미만", "13/1000", "13/1000"],
+            ["5천만원 이상 ~ 1억원 미만", "19/1000", "14/1000"],
+            ["1억원 이상 ~ 1억6천만원 미만", "21/1000", "16/1000"],
+            ["1억6천만원 이상 ~ 2억6천만원 미만", "23/1000", "18/1000"],
+            ["2억6천만원 이상 ~ 6억원 미만", "26/1000", "21/1000"],
+            ["6억원 이상", "31/1000", "26/1000"]
+          ], note: "매입금액 = 시가표준액 × 매입률 (예: 서울 시가표준액 5억원 아파트라면 26/1000 적용해 매입금액 약 1,300만원). 즉시매도 시 실제 부담하는 고객부담금은 매입금액 × 당일 채권 할인율로 훨씬 적어진다. 법령 개정으로 요율이 바뀔 수 있으니 매입 전 최신 요율을 사이트에서 재확인." }
+        ],
         list: [
           "① 부동산공시가격 알리미(realtyprice.kr) → '주택' → '공동주택공시가격' → 주소지 입력 → 최근 공동주택가격 확인해 메모",
           "② 주택도시기금(nhuf.molit.go.kr) → '청약/채권' → '셀프 채권매입 도우미' → '매입대상금액 조회하기'",
@@ -736,7 +854,7 @@ const REGISTRATION_TYPES = [
     baseWarnings: [
       "'e-Form(전자표준양식)'은 인터넷등기소 일반 로그인만으로 작성할 수 있지만, 작성 후 반드시 출력·날인해 첨부서류와 함께 등기소를 방문 제출해야 합니다. 등기소 방문 없이 온라인으로 접수까지 끝내는 '전자신청'을 이용하려면 신청인 본인이 사전에 등기소를 직접 방문해 '사용자등록'을 마쳐야 하고, 상대방(매도인)도 등록돼 있어야 하므로 셀프등기에서는 거의 쓰이지 않습니다. 이 가이드는 e-Form 작성 후 방문 제출 방식을 기준으로 합니다.",
       "등기부등본상 권리관계(가압류·근저당 등)는 잔금일 직전 반드시 재확인한다.",
-      "제출 서류는 대부분 등기 신청일 기준 1개월 이내 발급분이어야 하므로, 너무 일찍 발급해두지 않는다.",
+      "제출 서류 중 인감증명서, 주민등록등본·초본, 가족관계증명서, 토지대장·임야대장·건축물대장 등본은 부동산등기규칙상 발급일로부터 3개월 이내의 것이어야 하므로(등기 신청일 기준), 너무 일찍 발급해두지 않는다. 등기사항증명서(등기부등본) 자체는 법령상 정해진 유효기간은 없지만, 최신 권리관계를 확인해야 하므로 잔금일 직전(가능하면 당일)에 재발급받는 것이 원칙이다.",
       "매도인의 인감증명서·주민등록초본 주소는 계약서상 주소, 위임장 위임인 주소, 등기신청서 의무자 주소와 모두 일치해야 하므로 잔금일 현장에서 즉시 대조한다.",
       "혹시 법무사를 이용하기로 결정한다면 '법무통' 같은 비교 견적 서비스로 여러 곳의 보수료를 비교해보는 것도 방법입니다."
     ],
@@ -773,17 +891,13 @@ const REGISTRATION_TYPES = [
         ],
         effects: {
           yes: {
-            documents: [
-              { id: "lease-succession-clause", label: "임대차계약 승계 특약이 명시된 매매계약서", category: "tenant" },
-              { id: "tenant-resident-list", label: "전입세대열람내역서", category: "tenant", note: "주민센터에서 발급, 임차인 전입 여부 확인" },
-              { id: "lease-contract-copy", label: "기존 임대차계약서 사본(확정일자 확인)", category: "tenant" },
-              { id: "deposit-settlement", label: "보증금 정산 내역(계좌이체 확인증 등)", category: "tenant", note: "매도인-매수인 간 보증금 승계분 정산 증빙" }
-            ],
             steps: [
               { id: "notify-tenant", title: "임차인에게 임대인 지위 승계 통지", description: "잔금일 전후로 임차인에게 새 임대인(매수인) 정보와 보증금 반환 책임 승계 사실을 서면으로 통지한다.", details: [
                 "임차인에게 새 임대인의 성명, 연락처, 보증금 반환용 계좌번호를 문자메시지와 등기우편으로 함께 통지한다.",
                 "통지서에 '보증금 반환 채무가 매수인에게 승계되었다'는 문구를 명시한다.",
-                "통지 사본과 발송 증빙(문자 캡처, 등기우편 접수증)을 보관해 향후 분쟁에 대비한다."
+                "통지 사본과 발송 증빙(문자 캡처, 등기우편 접수증)을 보관해 향후 분쟁에 대비한다.",
+                "참고로 매매계약서의 임대차 승계 특약, 기존 임대차계약서 사본(확정일자 확인), 보증금 정산 내역(계좌이체 확인증 등)을 함께 보관해두면 향후 분쟁 시 근거가 된다 — 다만 이 자료들은 등기소에 제출하거나 임차인에게 전달하는 서류가 아니라, 매도인·매수인이 각자 보관해두는 용도다.",
+                "잔금 전 전입세대열람내역서(주민센터 발급)로 계약서에 없던 다른 세입자가 몰래 전입해 있지 않은지 확인해두면 좋다."
               ]}
             ]
           },
@@ -926,9 +1040,9 @@ const REGISTRATION_TYPES = [
     baseDocuments: [
       { id: "jeonse-contract", label: "전세권설정계약서", category: "common", note: "전세금액, 존속기간, 목적물 범위 명시" },
       { id: "landlord-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "landlord" },
-      { id: "landlord-seal-cert", label: "인감증명서", category: "landlord" },
-      { id: "landlord-abstract", label: "주민등록초본", category: "landlord" },
-      { id: "tenant-resident-doc", label: "주민등록등본", category: "tenant" },
+      { id: "landlord-seal-cert", label: "인감증명서", category: "landlord", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "landlord-abstract", label: "주민등록초본", category: "landlord", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "tenant-resident-doc", label: "주민등록등본", category: "tenant", note: "발급일로부터 3개월 이내여야 함" },
       { id: "tenant-id-stamp", label: "신분증, 도장", category: "tenant" },
       { id: "jeonse-tax", label: "등록면허세 납부영수증", category: "tax", note: "전세금액을 과세표준으로 위택스에서 신고·납부" },
       { id: "jeonse-form", label: "전세권설정등기신청서", category: "form" },
@@ -963,7 +1077,8 @@ const REGISTRATION_TYPES = [
       ]}
     ],
     baseWarnings: [
-      "전세권설정등기는 임대인의 적극적인 협조(등기필증·인감증명서 제공)가 필수이므로, 협조가 어려운 경우 전입신고+확정일자 방식과 병행 여부를 검토하세요."
+      "전세권설정등기는 임대인의 적극적인 협조(등기필증·인감증명서 제공)가 필수이므로, 협조가 어려운 경우 전입신고+확정일자 방식과 병행 여부를 검토하세요.",
+      "인감증명서, 주민등록등본·초본은 부동산등기규칙상 발급일로부터 3개월 이내의 것이어야 하므로, 등기 접수일에 임박해 발급받는다."
     ],
     questions: [
       {
@@ -1003,12 +1118,12 @@ const REGISTRATION_TYPES = [
     baseDocuments: [
       { id: "gift-contract", label: "증여계약서", category: "common" },
       { id: "donor-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "donor" },
-      { id: "donor-seal-cert", label: "인감증명서 (부동산 증여용)", category: "donor", note: "수증자 인적사항이 기재된 용도로 발급" },
-      { id: "donor-abstract", label: "주민등록초본", category: "donor" },
-      { id: "donee-resident-doc", label: "주민등록등본", category: "donee" },
+      { id: "donor-seal-cert", label: "인감증명서 (부동산 증여용)", category: "donor", note: "수증자 인적사항이 기재된 용도로 발급. 발급일로부터 3개월 이내여야 함" },
+      { id: "donor-abstract", label: "주민등록초본", category: "donor", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "donee-resident-doc", label: "주민등록등본", category: "donee", note: "발급일로부터 3개월 이내여야 함" },
       { id: "donee-id-stamp", label: "신분증, 도장", category: "donee" },
       { id: "gift-acquisition-tax", label: "취득세(증여) 납부영수증", category: "tax", note: "위택스에서 신고·납부" },
-      { id: "gift-bond", label: "국민주택채권 매입 영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 증여일 기준 공시가격으로 계산되므로 증여일 당일 이후~등기신청 전 사이에 매입" },
+      { id: "gift-bond", label: "국민주택채권 매입 영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 증여일 기준 공시가격으로 계산되므로 증여일 당일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고" },
       { id: "gift-form", label: "소유권이전등기신청서(증여)", category: "form" }
     ],
     baseSteps: [
@@ -1027,19 +1142,30 @@ const REGISTRATION_TYPES = [
       ]},
       { id: "g4", title: "등기서류 준비 및 접수", description: "증여자의 인감증명서 등 서류를 갖추어 관할 등기소에 접수한다.", details: [
         "등기신청서의 등기원인을 '증여'로, 등기원인일자를 계약일로 기재한다.",
-        "국민주택채권은 취득세와 마찬가지로 위택스 신고 이후 주택도시기금(nhuf.molit.go.kr)에서 증여일 기준 공시가격으로 매입·즉시매도한다 (상단 서류 목록의 안내 참고)."
+        "국민주택채권은 취득세와 마찬가지로 위택스 신고 이후 주택도시기금(nhuf.molit.go.kr)에서 증여일 기준 공시가격으로 매입·즉시매도한다. 증여·상속은 매매보다 매입률이 더 높은 별도 요율표를 쓰므로 '자세히 보기'에서 확인한다."
       ], checklist: [
         "증여자 인감증명서(부동산 증여용) 준비",
         "증여자 등기필증(또는 등기필정보) 준비",
         "수증자 주민등록등본 준비",
         "취득세(증여) 납부영수증, 국민주택채권 매입영수증 준비"
-      ]},
+      ], deepDive: {
+        calculators: [{ id: "gift-bond", kind: "bond-free" }],
+        tables: [
+          { title: "매입기준율표 — 상속·증여 등 무상취득", headers: ["시가표준액", "서울·광역시", "그 외 지역"], rows: [
+            ["1천만원 이상 ~ 5천만원 미만", "18/1000", "14/1000"],
+            ["5천만원 이상 ~ 1억5천만원 미만", "28/1000", "25/1000"],
+            ["1억5천만원 이상", "42/1000", "39/1000"]
+          ], note: "매매 등 유상 소유권이전(2천만원 이상 6억원 미만 구간 13~31/1000)보다 높은 별도 요율이다. 매입금액 = 시가표준액 × 매입률이며, 즉시매도 시 실제 부담하는 고객부담금은 매입금액 × 당일 채권 할인율로 이보다 훨씬 적다(할인율은 매일 바뀌므로 매입 당일 사이트에서 확인). 법령 개정 가능성 있으니 매입 전 최신 요율 재확인." }
+        ],
+        links: [{ label: "주택도시기금(국민주택채권)", url: "https://nhuf.molit.go.kr" }]
+      }},
       { id: "g5", title: "등기완료 확인", description: "등기사항증명서에서 소유권 변경 사실을 확인한다.", details: [
         "등기사항증명서 갑구에서 등기원인이 '증여'로, 소유자가 수증자로 정확히 기재되었는지 확인한다."
       ]}
     ],
     baseWarnings: [
-      "증여세는 등기와 별도로 국세청에 신고해야 하며, 신고 기한(3개월)을 놓치면 가산세가 부과됩니다. 배우자·직계존비속 간에는 별도의 증여재산 공제 한도가 적용되니 세무 전문가 상담을 권장합니다."
+      "증여세는 등기와 별도로 국세청에 신고해야 하며, 신고 기한(3개월)을 놓치면 가산세가 부과됩니다. 배우자·직계존비속 간에는 별도의 증여재산 공제 한도가 적용되니 세무 전문가 상담을 권장합니다.",
+      "인감증명서, 주민등록등본·초본은 부동산등기규칙상 발급일로부터 3개월 이내의 것이어야 하므로, 등기 접수일에 임박해 발급받는다."
     ],
     questions: [
       {
@@ -1070,13 +1196,13 @@ const REGISTRATION_TYPES = [
       { key: "form", label: "등기신청서" }
     ],
     baseDocuments: [
-      { id: "decedent-basic-cert", label: "기본증명서(사망사실 포함)", category: "decedent" },
-      { id: "decedent-family-cert", label: "가족관계증명서(상세)", category: "decedent" },
-      { id: "decedent-old-register", label: "제적등본", category: "decedent", note: "구법상 상속인 확인을 위해 요구되는 경우가 많음" },
-      { id: "heirs-family-cert", label: "상속인 전원의 가족관계증명서", category: "heirs" },
-      { id: "heirs-resident-doc", label: "상속인 전원의 주민등록등본", category: "heirs" },
+      { id: "decedent-basic-cert", label: "기본증명서(사망사실 포함)", category: "decedent", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "decedent-family-cert", label: "가족관계증명서(상세)", category: "decedent", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "decedent-old-register", label: "제적등본", category: "decedent", note: "구법상 상속인 확인을 위해 요구되는 경우가 많음. 가족관계증명서와 마찬가지로 발급일로부터 3개월 이내를 권장" },
+      { id: "heirs-family-cert", label: "상속인 전원의 가족관계증명서", category: "heirs", note: "발급일로부터 3개월 이내여야 함" },
+      { id: "heirs-resident-doc", label: "상속인 전원의 주민등록등본", category: "heirs", note: "발급일로부터 3개월 이내여야 함" },
       { id: "inheritance-acquisition-tax", label: "취득세(상속) 납부영수증", category: "tax", note: "위택스에서 신고·납부, 사망일로부터 6개월 이내" },
-      { id: "inheritance-bond", label: "국민주택채권 매입 영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 상속개시일(사망일) 기준 공시가격으로 계산되므로 사망일 이후~등기신청 전 사이에 매입" },
+      { id: "inheritance-bond", label: "국민주택채권 매입 영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 상속개시일(사망일) 기준 공시가격으로 계산되므로 사망일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고" },
       { id: "inheritance-form", label: "소유권이전등기신청서(상속)", category: "form" }
     ],
     baseSteps: [
@@ -1097,18 +1223,29 @@ const REGISTRATION_TYPES = [
       { id: "i4", title: "등기서류 준비 및 접수", description: "가족관계 서류와 분할협의서(필요시)를 갖추어 관할 등기소에 접수한다.", details: [
         "가족관계 서류, 분할협의서(협의분할 시), 취득세 영수증을 갖추어 관할 등기소를 방문한다.",
         "등기신청서의 등기원인은 '상속'으로, 등기원인일자는 사망일(상속개시일)로 기재한다.",
-        "국민주택채권은 위택스 신고 이후 주택도시기금(nhuf.molit.go.kr)에서 사망일(상속개시일) 기준 공시가격으로 매입·즉시매도한다 (상단 서류 목록의 안내 참고)."
+        "국민주택채권은 위택스 신고 이후 주택도시기금(nhuf.molit.go.kr)에서 사망일(상속개시일) 기준 공시가격으로 매입·즉시매도한다. 증여·상속은 매매보다 매입률이 더 높은 별도 요율표를 쓰므로 '자세히 보기'에서 확인한다."
       ], checklist: [
         "가족관계 서류(기본증명서, 가족관계증명서, 제적등본) 상속인 전원분 준비",
         "분할협의서(협의분할 시) 상속인 전원 인감도장 날인 확인",
         "취득세(상속) 납부영수증, 국민주택채권 매입영수증 준비"
-      ]},
+      ], deepDive: {
+        calculators: [{ id: "inheritance-bond", kind: "bond-free" }],
+        tables: [
+          { title: "매입기준율표 — 상속·증여 등 무상취득", headers: ["시가표준액", "서울·광역시", "그 외 지역"], rows: [
+            ["1천만원 이상 ~ 5천만원 미만", "18/1000", "14/1000"],
+            ["5천만원 이상 ~ 1억5천만원 미만", "28/1000", "25/1000"],
+            ["1억5천만원 이상", "42/1000", "39/1000"]
+          ], note: "매매 등 유상 소유권이전(2천만원 이상 6억원 미만 구간 13~31/1000)보다 높은 별도 요율이다. 매입금액 = 시가표준액 × 매입률이며, 즉시매도 시 실제 부담하는 고객부담금은 매입금액 × 당일 채권 할인율로 이보다 훨씬 적다(할인율은 매일 바뀌므로 매입 당일 사이트에서 확인). 법령 개정 가능성 있으니 매입 전 최신 요율 재확인." }
+        ],
+        links: [{ label: "주택도시기금(국민주택채권)", url: "https://nhuf.molit.go.kr" }]
+      }},
       { id: "i5", title: "등기완료 확인", description: "등기사항증명서에서 상속인 명의 이전을 확인한다.", details: [
         "등기사항증명서에서 상속인 명의로 정확히 이전되었는지, 지분율이 법정상속분(또는 협의 내용)과 일치하는지 확인한다."
       ]}
     ],
     baseWarnings: [
-      "상속재산 규모, 상속세 신고 여부(사망일로부터 6개월 이내), 상속포기·한정승인 여부에 따라 절차가 크게 달라질 수 있어 사전에 세무사·법무사 상담을 권장합니다."
+      "상속재산 규모, 상속세 신고 여부(사망일로부터 6개월 이내), 상속포기·한정승인 여부에 따라 절차가 크게 달라질 수 있어 사전에 세무사·법무사 상담을 권장합니다.",
+      "가족관계증명서, 제적등본, 주민등록등본은 부동산등기규칙상(또는 실무상) 발급일로부터 3개월 이내의 것이어야 하므로, 등기 접수일에 임박해 발급받는다."
     ],
     questions: [
       {
@@ -1220,6 +1357,156 @@ function mockTimeline(stops) {
     return i < stops.length - 1 ? stop + `<div class="arrow">→</div>` : stop;
   }).join("");
   return `<div class="mock-timeline">${items}</div>`;
+}
+
+// 인지세·국민주택채권 계산 로직. 시각화용 표(REGISTRATION_TYPES 안의 tables)와 반드시 같은 수치를 쓴다.
+const STAMP_DUTY_BRACKETS = [
+  { max: 10000000, amount: 0, label: "1천만원 이하 (면제)" },
+  { max: 30000000, amount: 20000, label: "1천만원 초과 ~ 3천만원 이하" },
+  { max: 50000000, amount: 40000, label: "3천만원 초과 ~ 5천만원 이하" },
+  { max: 100000000, amount: 70000, label: "5천만원 초과 ~ 1억원 이하" },
+  { max: 1000000000, amount: 150000, label: "1억원 초과 ~ 10억원 이하" },
+  { max: Infinity, amount: 350000, label: "10억원 초과" }
+];
+function calcStampDuty(amount) {
+  return STAMP_DUTY_BRACKETS.find(b => amount <= b.max);
+}
+
+const BOND_RATE_TABLES = {
+  paid: [ // 매매 등 유상 소유권이전 (주택)
+    { min: 20000000, max: 50000000, capital: 13, other: 13, label: "2천만원 이상 ~ 5천만원 미만" },
+    { min: 50000000, max: 100000000, capital: 19, other: 14, label: "5천만원 이상 ~ 1억원 미만" },
+    { min: 100000000, max: 160000000, capital: 21, other: 16, label: "1억원 이상 ~ 1억6천만원 미만" },
+    { min: 160000000, max: 260000000, capital: 23, other: 18, label: "1억6천만원 이상 ~ 2억6천만원 미만" },
+    { min: 260000000, max: 600000000, capital: 26, other: 21, label: "2억6천만원 이상 ~ 6억원 미만" },
+    { min: 600000000, max: Infinity, capital: 31, other: 26, label: "6억원 이상" }
+  ],
+  free: [ // 상속·증여 등 무상취득
+    { min: 10000000, max: 50000000, capital: 18, other: 14, label: "1천만원 이상 ~ 5천만원 미만" },
+    { min: 50000000, max: 150000000, capital: 28, other: 25, label: "5천만원 이상 ~ 1억5천만원 미만" },
+    { min: 150000000, max: Infinity, capital: 42, other: 39, label: "1억5천만원 이상" }
+  ]
+};
+// 국민주택채권 최저매입금액은 1만원이며, 1만원 미만 단수는 5천원 이상이면 올리고 미만이면 버린다 (주택도시기금법 시행령 별표 4호)
+function roundBondAmount(raw) {
+  const remainder = raw % 10000;
+  const rounded = remainder === 0 ? raw : (remainder >= 5000 ? raw - remainder + 10000 : raw - remainder);
+  return Math.max(rounded, 10000);
+}
+function calcBond(amount, region, kind) {
+  const bracket = BOND_RATE_TABLES[kind].find(b => amount >= b.min && amount < b.max);
+  if (!bracket) return null;
+  const rate = region === "capital" ? bracket.capital : bracket.other;
+  return { rate, label: bracket.label, amount: roundBondAmount(Math.round(amount * rate / 1000)) };
+}
+
+// 인지세·국민주택채권 매입기준율표처럼 구간별 수치가 여러 개 나열되는 정보를 표로 렌더링한다
+function renderRateTable(t) {
+  return `
+    <div class="dd-table-wrap">
+      ${t.title ? `<div class="dd-table-title">${esc(t.title)}</div>` : ""}
+      <div class="dd-table-scroll">
+        <table class="dd-table">
+          <thead><tr>${t.headers.map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead>
+          <tbody>${t.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>
+        </table>
+      </div>
+      ${t.note ? `<div class="dd-table-note">${linkify(t.note)}</div>` : ""}
+    </div>
+  `;
+}
+
+// 거래금액/시가표준액을 입력하면 인지세·국민주택채권 매입액을 즉시 계산해주는 미니 계산기
+function renderCalculator(calc) {
+  const id = esc(calc.id);
+  if (calc.kind === "stamp") {
+    return `
+      <div class="dd-calc" data-calc-id="${id}" data-calc-kind="stamp">
+        <div class="dd-calc-title">🧮 계산기 — 거래금액을 입력하면 인지세를 바로 확인할 수 있어요</div>
+        <div class="dd-calc-row">
+          <label for="calc-${id}-amount">거래금액</label>
+          <div class="dd-calc-input-wrap">
+            <input id="calc-${id}-amount" type="text" inputmode="numeric" placeholder="예: 500,000,000" class="dd-calc-input">
+            <span class="dd-calc-unit">원</span>
+          </div>
+        </div>
+        <div class="dd-calc-result" id="calc-${id}-result">거래금액을 입력하면 결과가 여기 표시됩니다.</div>
+      </div>
+    `;
+  }
+  return `
+    <div class="dd-calc" data-calc-id="${id}" data-calc-kind="${esc(calc.kind)}">
+      <div class="dd-calc-title">🧮 계산기 — 시가표준액과 지역을 입력하면 채권매입금액을 바로 확인할 수 있어요</div>
+      <div class="dd-calc-row">
+        <label for="calc-${id}-amount">시가표준액</label>
+        <div class="dd-calc-input-wrap">
+          <input id="calc-${id}-amount" type="text" inputmode="numeric" placeholder="예: 500,000,000" class="dd-calc-input">
+          <span class="dd-calc-unit">원</span>
+        </div>
+      </div>
+      <div class="dd-calc-row">
+        <label for="calc-${id}-region">지역</label>
+        <select id="calc-${id}-region" class="dd-calc-select">
+          <option value="capital">서울·광역시</option>
+          <option value="other">그 외 지역</option>
+        </select>
+      </div>
+      <div class="dd-calc-row">
+        <label for="calc-${id}-discount">채권 할인율</label>
+        <div class="dd-calc-input-wrap">
+          <input id="calc-${id}-discount" type="text" inputmode="decimal" placeholder="예: 15.5 (선택, 당일 조회값)" class="dd-calc-input">
+          <span class="dd-calc-unit">%</span>
+        </div>
+      </div>
+      <div class="dd-calc-result" id="calc-${id}-result">시가표준액을 입력하면 결과가 여기 표시됩니다.</div>
+    </div>
+  `;
+}
+
+function wireCalculators(calculators) {
+  (calculators || []).forEach(calc => {
+    const id = calc.id;
+    const amountEl = document.getElementById(`calc-${id}-amount`);
+    const resultEl = document.getElementById(`calc-${id}-result`);
+    const regionEl = document.getElementById(`calc-${id}-region`);
+    const discountEl = document.getElementById(`calc-${id}-discount`);
+    if (!amountEl || !resultEl) return;
+    const placeholder = calc.kind === "stamp" ? "거래금액을 입력하면 결과가 여기 표시됩니다." : "시가표준액을 입력하면 결과가 여기 표시됩니다.";
+    function update() {
+      const digits = amountEl.value.replace(/[^0-9]/g, "");
+      if (!digits) { resultEl.textContent = placeholder; return; }
+      const amount = Number(digits);
+      if (calc.kind === "stamp") {
+        const b = calcStampDuty(amount);
+        resultEl.innerHTML = `<b>${b.amount ? b.amount.toLocaleString("ko-KR") + "원" : "면제 (납부 대상 아님)"}</b><span class="dd-calc-sub">${esc(b.label)} 구간</span>`;
+      } else {
+        const kind = calc.kind === "bond-paid" ? "paid" : "free";
+        const r = calcBond(amount, regionEl.value, kind);
+        if (!r) {
+          resultEl.innerHTML = `<span class="dd-calc-sub">시가표준액이 이 표의 최소 구간보다 적습니다 — 매입 대상 여부를 주택도시기금 사이트에서 확인하세요.</span>`;
+        } else {
+          const discountRaw = discountEl ? discountEl.value.trim() : "";
+          const discountPct = discountRaw ? Number(discountRaw) : NaN;
+          if (discountRaw && Number.isFinite(discountPct) && discountPct > 0) {
+            const burden = Math.round(r.amount * discountPct / 100);
+            resultEl.innerHTML = `<b>${burden.toLocaleString("ko-KR")}원</b><span class="dd-calc-sub">즉시매도 시 실제 부담하는 고객부담금 (매입금액 ${r.amount.toLocaleString("ko-KR")}원 × 할인율 ${discountPct}%) · 매입률 ${r.rate}/1000 (${esc(r.label)})</span>`;
+          } else {
+            resultEl.innerHTML = `<b>${r.amount.toLocaleString("ko-KR")}원</b><span class="dd-calc-sub">매입률 ${r.rate}/1000 (${esc(r.label)}) 적용 매입금액. 위에 오늘자 채권 할인율(%)을 입력하면 실제 고객부담금까지 계산됩니다.</span>`;
+          }
+        }
+      }
+    }
+    amountEl.addEventListener("input", () => {
+      const digits = amountEl.value.replace(/[^0-9]/g, "");
+      amountEl.value = digits ? Number(digits).toLocaleString("ko-KR") : "";
+      update();
+    });
+    if (regionEl) regionEl.addEventListener("change", update);
+    if (discountEl) discountEl.addEventListener("input", () => {
+      discountEl.value = discountEl.value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
+      update();
+    });
+  });
 }
 
 const state = { view: "home", typeId: null, questionIndex: 0, answers: {}, checked: {} };
@@ -1527,7 +1814,7 @@ function renderResult() {
       <div class="result-grid">
         ${mainColumnHtml}
         ${hasDeepDive ? `
-        <div class="detail-rail no-print">
+        <div class="detail-rail no-print" id="detail-rail">
           <div class="detail-card" id="deepdive-panel">
             <div class="detail-placeholder" id="detail-placeholder">
               <div class="icon">🔍</div>
@@ -1567,6 +1854,9 @@ function renderResult() {
       if (canHover) btn.addEventListener("mouseenter", () => openDeepDive(checklist, stepId));
     });
     document.getElementById("deepdive-close").addEventListener("click", resetDeepDive);
+    document.getElementById("detail-rail").addEventListener("click", (e) => {
+      if (e.target.id === "detail-rail") resetDeepDive();
+    });
   }
 }
 
@@ -1588,16 +1878,26 @@ function openDeepDive(checklist, stepId) {
     </div>
   ` : "";
   const listHtml = dd.list ? `<ol>${dd.list.map((li, i) => `<li>${(pairedMockups && pairedMockups[i]) || ""}${linkify(li)}</li>`).join("")}</ol>` : "";
+  const tablesHtml = dd.tables ? dd.tables.map(renderRateTable).join("") : "";
+  const calculatorsHtml = dd.calculators ? dd.calculators.map(renderCalculator).join("") : "";
   document.getElementById("deepdive-title").textContent = step.title;
   document.getElementById("deepdive-body").innerHTML = `
     ${topMockup || ""}
+    ${calculatorsHtml}
+    ${tablesHtml}
     ${sectionsHtml}
     ${listHtml}
     ${dd.links && dd.links.length ? `<div class="deepdive-links">${dd.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>` : ""}
   `;
+  wireCalculators(dd.calculators);
   document.getElementById("detail-placeholder").hidden = true;
   document.getElementById("deepdive-head").hidden = false;
   document.getElementById("deepdive-body").hidden = false;
+  const rail = document.getElementById("detail-rail");
+  rail.classList.add("dd-open");
+  if (window.matchMedia("(max-width: 1099.98px)").matches) {
+    document.body.style.overflow = "hidden";
+  }
 }
 
 function resetDeepDive() {
@@ -1606,9 +1906,12 @@ function resetDeepDive() {
   placeholder.hidden = false;
   document.getElementById("deepdive-head").hidden = true;
   document.getElementById("deepdive-body").hidden = true;
+  document.getElementById("detail-rail").classList.remove("dd-open");
+  document.body.style.overflow = "";
 }
 
 function render() {
+  document.body.style.overflow = ""; // 이전 화면에서 모바일 자세히보기 시트가 열려있었다면 스크롤 잠금을 해제한다.
   if (state.view === "home") renderHome();
   else if (state.view === "select-type") renderSelectType();
   else if (state.view === "question") renderQuestion();
