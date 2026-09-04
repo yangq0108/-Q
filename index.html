@@ -416,6 +416,8 @@
 
   /* 거래금액·시가표준액을 입력하면 인지세·채권매입액을 바로 계산해주는 미니 계산기 */
   .dd-calc {
+    box-sizing: border-box;
+    max-width: 100%;
     border: 1px solid #bfdbfe;
     background: var(--primary-container, #eff6ff);
     border-radius: 14px;
@@ -423,11 +425,12 @@
     margin-bottom: 18px;
   }
   .dd-calc-title { font-size: 12.5px; font-weight: 700; color: var(--primary, #1d4ed8); margin-bottom: 10px; }
-  .dd-calc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .dd-calc-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 8px; min-width: 0; }
   .dd-calc-row:last-of-type { margin-bottom: 0; }
   .dd-calc-row label { font-size: 12.5px; color: #334155; flex-shrink: 0; width: 92px; }
   .dd-calc-input-wrap {
-    flex: 1;
+    flex: 1 1 140px;
+    min-width: 0;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -435,9 +438,11 @@
     border: 1px solid #bfdbfe;
     border-radius: 8px;
     padding: 0 10px;
+    box-sizing: border-box;
   }
   .dd-calc-input {
     flex: 1;
+    width: 100%;
     border: none;
     outline: none;
     padding: 8px 0;
@@ -448,7 +453,9 @@
   }
   .dd-calc-unit { font-size: 12.5px; color: #64748b; flex-shrink: 0; }
   .dd-calc-select {
-    flex: 1;
+    flex: 1 1 140px;
+    min-width: 0;
+    box-sizing: border-box;
     border: 1px solid #bfdbfe;
     border-radius: 8px;
     padding: 8px 10px;
@@ -653,9 +660,9 @@ const REGISTRATION_TYPES = [
       { id: "seller-seal-stamp", label: "인감도장 날인 서류 일체", category: "seller" },
       { id: "buyer-resident-doc", label: "주민등록등본(또는 초본)", category: "buyer", note: "발급일로부터 3개월 이내여야 함" },
       { id: "buyer-id", label: "신분증, 도장", category: "buyer" },
-      { id: "acquisition-tax-receipt", label: "취득세 영수필확인서", category: "tax", note: "서울은 이택스(etax.seoul.go.kr)/STAX 앱, 그 외 지역은 위택스(wetax.go.kr)/스마트위택스 앱에서 신고·납부한 뒤 '납부확인서' 메뉴에서 출력 (등기 첨부서류로는 관행상 '영수필확인서'라 부르지만 같은 문서). 지방세는 카드 납부 수수료가 없어 카드사 무이자 할부 이벤트를 활용하면 유리. 이 문서의 쓰임새는 두 가지로 분리된다 — ① 납부 정보(세액·납부번호)는 e-Form 4단계 '수수료등 입력'의 등록면허세(취득세) 입력란에 입력, ② 문서 원본은 그와 별개로 등기소 접수(s7) 때 첨부서류로 제출." },
-      { id: "national-housing-bond", label: "국민주택채권 매입영수증", category: "tax", note: "부동산공시가격 알리미(realtyprice.kr)에서 공시가격 확인 후 주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입. 대부분 매입과 동시에 즉시매도(할인)해 차액(고객부담금)만 부담하며, 공동명의는 지분대로 나눠 2건으로 매입. 채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로 잔금일 당일이나 그 이후(등기신청 전까지) 매입하는 것이 원칙 — 며칠씩 미리 매입할 필요는 없고, 매년 4~5월경 공동주택가격이 새로 고시되니 그 시기와 잔금일이 겹치면 최신 공시가격 반영 여부를 재확인. 매입기준율표와 고객부담금 계산 예시는 '국민주택채권 매입' 단계의 자세히 보기 참고. 이 영수증의 쓰임새는 두 가지 — ① 영수증에 적힌 14자리 채권발행번호를 e-Form 4단계 '국민주택채권매입액 입력'란에 입력, ② 영수증 원본(공동명의는 2장)은 등기소 접수(s7) 때 그대로 제출. (2004년 이후 '매입필증'이라는 실물 증서는 발급되지 않고 은행이 발급하는 이 영수증이 유일한 증빙이다)" },
-      { id: "registration-fee", label: "등기신청수수료 전자납부확인서", category: "tax", note: "대법원 인터넷등기소(iros.go.kr)에서 전자납부. e-Form(전자표준양식) 기준 13,000원이며, 확인서는 납부일로부터 14일간만 유효. 쓰임새는 두 가지 — ① 확인서에 적힌 납부번호를 e-Form 4단계 '수수료등 입력'의 등기신청수수료 납부정보란에 입력, ② 확인서 원본은 등기소 접수(s7) 때 제출." },
+      { id: "acquisition-tax-receipt", label: "취득세 영수필확인서", category: "tax", note: "서울은 이택스(etax.seoul.go.kr)/STAX 앱, 그 외 지역은 위택스(wetax.go.kr)/스마트위택스 앱에서 신고·납부한 뒤 '납부확인서' 메뉴에서 출력 (등기 첨부서류로는 관행상 '영수필확인서'라 부르지만 같은 문서). 지방세는 카드 납부 수수료가 없어 카드사 무이자 할부 이벤트를 활용하면 유리. 이 문서의 쓰임새는 두 가지로 분리된다.\n① 납부 정보(세액·납부번호) → e-Form 4단계 '수수료등 입력'의 등록면허세(취득세) 입력란에 입력\n② 문서 원본 → 등기소 접수(s7) 때 첨부서류로 제출" },
+      { id: "national-housing-bond", label: "국민주택채권 매입영수증", category: "tax", note: "부동산공시가격 알리미(realtyprice.kr)에서 공시가격 확인 후 주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입. 대부분 매입과 동시에 즉시매도(할인)해 차액(고객부담금)만 부담하며, 공동명의는 지분대로 나눠 2건으로 매입. 채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로 잔금일 당일이나 그 이후(등기신청 전까지) 매입하는 것이 원칙 — 며칠씩 미리 매입할 필요는 없고, 매년 4~5월경 공동주택가격이 새로 고시되니 그 시기와 잔금일이 겹치면 최신 공시가격 반영 여부를 재확인. 매입기준율표와 고객부담금 계산 예시는 '국민주택채권 매입' 단계의 자세히 보기 참고. 이 영수증의 쓰임새는 두 가지.\n① 14자리 채권발행번호 → e-Form 4단계 '국민주택채권매입액 입력'란에 입력\n② 영수증 원본(공동명의는 2장) → 등기소 접수(s7) 때 그대로 제출\n(2004년 이후 '매입필증'이라는 실물 증서는 발급되지 않고 은행이 발급하는 이 영수증이 유일한 증빙이다)" },
+      { id: "registration-fee", label: "등기신청수수료 전자납부확인서", category: "tax", note: "대법원 인터넷등기소(iros.go.kr)에서 전자납부. e-Form(전자표준양식) 기준 13,000원이며, 확인서는 납부일로부터 14일간만 유효. 쓰임새는 두 가지.\n① 납부번호 → e-Form 4단계 '수수료등 입력'의 등기신청수수료 납부정보란에 입력\n② 확인서 원본 → 등기소 접수(s7) 때 제출" },
       { id: "gov-revenue-stamp", label: "전자수입인지 납부확인증", category: "tax", note: "전자수입인지(e-revenuestamp.or.kr)에서 거래금액에 따른 세액을 구매하면 '납부확인증'이라는 이름으로 출력된다 (세액 구간표는 '전자수입인지 구매' 단계의 자세히 보기 참고). 프린터 직접 연결 필요, 단 1회만 출력 가능, 구매 후 취소 불가(우체국·금융회사 환매만 가능). 공동명의여도 총액 기준 1장만 구매. 세액은 계약서상 거래금액만으로 정해지므로 잔금일을 기다릴 필요 없이 계약 체결 직후부터 등기신청 전까지 아무 때나 미리 구매·출력해도 무방. 다른 영수증들과 달리 e-Form에 입력할 정보가 없다 — 출력한 납부확인증을 매매계약서 원본에 첨부해 등기소 접수(s7) 때 그대로 제출하는 것이 유일한 쓰임." },
       { id: "registration-form", label: "소유권이전등기신청서", category: "form", note: "대법원 인터넷등기소(iros.go.kr) 'e-Form' 작성 프로그램으로 작성·출력" },
       { id: "poa-form", label: "등기신청 위임장", category: "form", note: "매수인이 등기소에 직접 접수할 때 매도인의 위임을 증명하는 서류. 매도인 인감도장 날인이 필수이므로, 잔금날 실수에 대비해 여분 1부를 더해 총 2부를 준비해두는 것을 권장" }
@@ -711,7 +718,7 @@ const REGISTRATION_TYPES = [
         "취득한 날로부터 60일 이내가 법정 기한이지만, 등기 접수에 납부 영수증이 필요하므로 실제로는 잔금 당일 오전 7시 이후 출발 전에 미리 끝내두는 것이 편하다.",
         "지방세는 카드 납부 수수료가 없으므로, 카드사별 지방세 무이자 할부 이벤트를 확인해 신용카드로 분할 납부하면 유리하다 (타인 납부도 가능)."
       ], checklist: [
-        "취득세 영수필확인서(위택스 화면명은 '납부확인서') 확보 — ① e-Form 4단계 '수수료등 입력'에 납부정보 입력용, ② 등기소 접수(s7) 원본 제출용으로 각각 쓰인다"
+        "취득세 영수필확인서(위택스 화면명은 '납부확인서') 확보\n① e-Form 4단계 '수수료등 입력'에 납부정보 입력용\n② 등기소 접수(s7) 원본 제출용"
       ]},
       { id: "s5", title: "국민주택채권 매입", description: "공시가격 기준으로 채권을 매입하고 즉시 매도(할인)한다. (원칙적으로 잔금일 당일~등기신청 전 사이에 매입)", details: [
         "채권매입금액은 취득일(통상 잔금일) 기준 공시가격으로 계산되므로, 원칙적으로 잔금일 당일이나 그 이후(등기신청 전까지) 매입한다 — 미리 며칠씩 앞당겨 살 필요는 없다. 다만 매년 4월 말~5월 말경 공동주택가격이 새로 고시되니, 잔금일이 이 시기와 겹친다면 최신 공시가격이 반영됐는지 다시 확인한다.",
@@ -723,7 +730,7 @@ const REGISTRATION_TYPES = [
         "매입과 동시에 즉시 할인율을 적용해 매도하면, 조회된 채권매입금액 전액이 아니라 '고객부담금'만 실제로 납부하면 된다.",
         "공동명의라면 공시가격을 지분대로(예: 1/2씩) 나눠 채권을 2건으로 매입한다."
       ], checklist: [
-        "국민주택채권 매입영수증(채권발행번호 포함, 공동명의는 2장) 확보 — ① e-Form 4단계 '국민주택채권매입액 입력'에 발행번호 입력용, ② 등기소 접수(s7) 원본 제출용으로 각각 쓰인다"
+        "국민주택채권 매입영수증(채권발행번호 포함, 공동명의는 2장) 확보\n① e-Form 4단계 '국민주택채권매입액 입력'에 발행번호 입력용\n② 등기소 접수(s7) 원본 제출용"
       ], deepDive: {
         calculators: [{ id: "sale-bond", kind: "bond-paid" }],
         tables: [
@@ -1126,7 +1133,7 @@ const REGISTRATION_TYPES = [
       { id: "donee-resident-doc", label: "주민등록등본", category: "donee", note: "발급일로부터 3개월 이내여야 함" },
       { id: "donee-id-stamp", label: "신분증, 도장", category: "donee" },
       { id: "gift-acquisition-tax", label: "취득세(증여) 영수필확인서", category: "tax", note: "위택스에서 '증여' 원인으로 신고·납부한 뒤 '납부확인서' 메뉴에서 출력 (등기 첨부서류로는 관행상 '영수필확인서'라 부름). 원본을 등기소 접수(g4) 때 그대로 제출하는 것이 유일한 쓰임 — 국민주택채권 매입금액 계산에는 쓰이지 않는다(채권 매입은 공시가격 기준)" },
-      { id: "gift-bond", label: "국민주택채권 매입영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 증여일 기준 공시가격으로 계산되므로 증여일 당일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고. 쓰임새는 두 가지 — ① 영수증에 적힌 채권발행번호를 등기신청서의 국민주택채권 관련란에 기재, ② 영수증 원본은 등기소 접수 때 그대로 제출" },
+      { id: "gift-bond", label: "국민주택채권 매입영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 증여일 기준 공시가격으로 계산되므로 증여일 당일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고. 쓰임새는 두 가지.\n① 채권발행번호 → 등기신청서의 국민주택채권 관련란에 기재\n② 영수증 원본 → 등기소 접수 때 그대로 제출" },
       { id: "gift-form", label: "소유권이전등기신청서(증여)", category: "form" }
     ],
     baseSteps: [
@@ -1205,7 +1212,7 @@ const REGISTRATION_TYPES = [
       { id: "heirs-family-cert", label: "상속인 전원의 가족관계증명서", category: "heirs", note: "발급일로부터 3개월 이내여야 함" },
       { id: "heirs-resident-doc", label: "상속인 전원의 주민등록등본", category: "heirs", note: "발급일로부터 3개월 이내여야 함" },
       { id: "inheritance-acquisition-tax", label: "취득세(상속) 영수필확인서", category: "tax", note: "위택스에서 '상속' 원인으로 신고·납부(사망일로부터 6개월 이내)한 뒤 '납부확인서' 메뉴에서 출력 (등기 첨부서류로는 관행상 '영수필확인서'라 부름). 원본을 등기소 접수(i4) 때 그대로 제출하는 것이 유일한 쓰임 — 국민주택채권 매입금액 계산에는 쓰이지 않는다(채권 매입은 공시가격 기준)" },
-      { id: "inheritance-bond", label: "국민주택채권 매입영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 상속개시일(사망일) 기준 공시가격으로 계산되므로 사망일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고. 쓰임새는 두 가지 — ① 영수증에 적힌 채권발행번호를 등기신청서의 국민주택채권 관련란에 기재, ② 영수증 원본은 등기소 접수 때 그대로 제출" },
+      { id: "inheritance-bond", label: "국민주택채권 매입영수증", category: "tax", note: "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미'에서 매입 후 즉시매도. 채권매입금액은 상속개시일(사망일) 기준 공시가격으로 계산되므로 사망일 이후~등기신청 전 사이에 매입. 매매보다 높은 별도 매입기준율표가 적용되니 '등기서류 준비 및 접수' 단계의 자세히 보기 참고. 쓰임새는 두 가지.\n① 채권발행번호 → 등기신청서의 국민주택채권 관련란에 기재\n② 영수증 원본 → 등기소 접수 때 그대로 제출" },
       { id: "inheritance-form", label: "소유권이전등기신청서(상속)", category: "form" }
     ],
     baseSteps: [
@@ -1341,7 +1348,7 @@ const SITE_LINKS = {
 };
 const SITE_DOMAINS_SORTED = Object.keys(SITE_LINKS).sort((a, b) => b.length - a.length);
 
-// 본문에 등장하는 사이트 도메인 문자열을 실제 하이퍼링크로 바꿔준다.
+// 본문에 등장하는 사이트 도메인 문자열을 실제 하이퍼링크로 바꿔주고, 줄바꿈("\n")은 <br>로 렌더링한다.
 function linkify(rawText) {
   let out = esc(rawText);
   SITE_DOMAINS_SORTED.forEach(domain => {
@@ -1350,7 +1357,7 @@ function linkify(rawText) {
     const re = new RegExp("(?<![\\w./])" + escaped + "(?![\\w/])", "g");
     out = out.replace(re, `<a href="${url}" target="_blank" rel="noopener">${domain}</a>`);
   });
-  return out;
+  return out.replace(/\n/g, "<br>");
 }
 
 // 잔금날처럼 "장소 이동" 흐름을 보여주는 아이콘 타임라인 (실제 사이트 화면을 흉내내지 않는 순수 도식)
