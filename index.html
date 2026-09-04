@@ -313,6 +313,9 @@
   .doc-usage-list li:last-child { margin-bottom: 0; }
 
   /* 잔금 지급·등기소 접수처럼 "서류 + 부수 + 비고"를 한눈에 봐야 하는 단계는 체크박스 달린 표로 보여준다 */
+  .step-doc-group { margin-bottom: 14px; }
+  .step-doc-group:last-child { margin-bottom: 0; }
+  .step-doc-group .doc-group-label { font-size: 12px; margin-bottom: 6px; }
   .step-doc-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
   table.step-doc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.step-doc-table th {
@@ -865,13 +868,13 @@ const REGISTRATION_TYPES = [
       { id: "s3", title: "잔금 지급 및 서류 수령", description: "잔금 지급과 동시에 매도인으로부터 등기에 필요한 서류를 받는다. (여기서 미리 출력해온 위임장에 매도인 인감도장을 받는다)", details: [
         "잔금일 직전 등기부등본을 재발급해 새로운 근저당·가압류 등 권리 변동이 없는지 최종 확인한다."
       ], checklistTable: [
-        { label: "등기신청 위임장 (e-Form 출력본, 여분 포함)", copies: "2부", note: "매도인 인감도장 날인 받기" },
-        { label: "소유권이전등기신청서 사본", copies: "1부", note: "참고용으로 지참" },
-        { label: "등기필증(또는 등기필정보)", copies: "1부", note: "매도인에게서 수령" },
-        { label: "인감증명서(매도용)", copies: "1부", note: "매도인에게서 수령" },
-        { label: "주민등록초본", copies: "1부", note: "매도인에게서 수령" },
-        { label: "잔금 영수증", copies: "1부", note: "매도인에게서 수령, 분쟁 대비 보관" },
-        { label: "중개수수료 현금영수증", copies: "1부", note: "공인중개사에게서 수령, 보관" }
+        { group: "매수인 지참 서류", label: "등기신청 위임장 (e-Form 출력본, 여분 포함)", copies: "2부", note: "매도인 인감도장 날인 받기" },
+        { group: "매수인 지참 서류", label: "소유권이전등기신청서 사본", copies: "1부", note: "참고용으로 지참" },
+        { group: "매도인에게 받을 서류", label: "등기필증(또는 등기필정보)", copies: "1부", note: "" },
+        { group: "매도인에게 받을 서류", label: "인감증명서(매도용)", copies: "1부", note: "" },
+        { group: "매도인에게 받을 서류", label: "주민등록초본", copies: "1부", note: "" },
+        { group: "정산·영수증", label: "잔금 영수증", copies: "1부", note: "매도인에게서 수령, 분쟁 대비 보관" },
+        { group: "정산·영수증", label: "중개수수료 현금영수증", copies: "1부", note: "공인중개사에게서 수령, 보관" }
       ], checklist: [
         "매수인 신분증·도장 지참",
         "인감도장과 인감증명서의 도장이 일치하는지 확인",
@@ -886,20 +889,20 @@ const REGISTRATION_TYPES = [
         "등기소 사전검토 창구에서 서류를 검사받아 미비점을 보완한 뒤, 등기신청수수료 영수증과 우편 봉투(필요시)를 함께 제출한다.",
         "e-Form(전자표준양식) 방식은 등기소 방문 제출이 원칙이다. 방문 없이 완전히 온라인으로 접수하는 '전자신청'을 하려면 등기소를 미리 방문해 '사용자등록'을 마쳐야 하고 매도인 측도 등록돼 있어야 해서, 셀프등기에서는 잘 쓰이지 않는다."
       ], checklistTable: [
-        { label: "부동산 매매계약서", copies: "1부(원본)", note: "전자수입인지 납부확인증이 첨부된 상태" },
-        { label: "부동산거래계약 신고필증", copies: "1부(원본)", note: "e-Form 입력에 쓴 나머지 1부는 이미 목적을 다함 — 제출은 이 1부만" },
-        { label: "건축물대장", copies: "1부(원본)", note: "" },
-        { label: "토지대장", copies: "1부(원본)", note: "" },
-        { label: "등기필증(또는 등기필정보)", copies: "1부", note: "매도인 소지분" },
-        { label: "인감증명서(매도용)", copies: "1부", note: "매도인 소지분" },
-        { label: "주민등록초본", copies: "1부", note: "매도인 소지분" },
-        { label: "주민등록등본(또는 초본)", copies: "1부", note: "매수인 소지분" },
-        { label: "취득세 영수필확인서", copies: "1부(원본)", note: "위택스 화면명 '납부확인서'" },
-        { label: "국민주택채권 매입영수증", copies: "1부(원본)", note: "채권발행번호 확인 — 공동명의라면 지분별 영수증 2부" },
-        { label: "등기신청수수료 전자납부확인서", copies: "1부(원본)", note: "납부번호 확인" },
-        { label: "전자수입인지 납부확인증", copies: "1부(원본)", note: "매매계약서에 첨부한 상태로 지참, 1회만 출력되므로 여분 없음" },
-        { label: "소유권이전등기신청서", copies: "1부(원본)", note: "등기필정보 기재·간인 완료" },
-        { label: "등기신청 위임장", copies: "2부(원본)", note: "날인 완료, 여분 포함" }
+        { group: "공통·물건 서류", label: "부동산 매매계약서", copies: "1부(원본)", note: "" },
+        { group: "공통·물건 서류", label: "부동산거래계약 신고필증", copies: "1부(원본)", note: "e-Form 입력에 쓴 나머지 1부는 이미 목적을 다함 — 제출은 이 1부만" },
+        { group: "공통·물건 서류", label: "건축물대장", copies: "1부(원본)", note: "" },
+        { group: "공통·물건 서류", label: "토지대장", copies: "1부(원본)", note: "" },
+        { group: "매도인 서류", label: "등기필증(또는 등기필정보)", copies: "1부", note: "" },
+        { group: "매도인 서류", label: "인감증명서(매도용)", copies: "1부", note: "" },
+        { group: "매도인 서류", label: "주민등록초본", copies: "1부", note: "" },
+        { group: "매수인 서류", label: "주민등록등본(또는 초본)", copies: "1부", note: "" },
+        { group: "세금·비용 서류", label: "취득세 영수필확인서", copies: "1부(원본)", note: "위택스 화면명 '납부확인서'" },
+        { group: "세금·비용 서류", label: "국민주택채권 매입영수증", copies: "1부(원본)", note: "채권발행번호 확인 — 공동명의라면 지분별 영수증 2부" },
+        { group: "세금·비용 서류", label: "등기신청수수료 전자납부확인서", copies: "1부(원본)", note: "납부번호 확인" },
+        { group: "세금·비용 서류", label: "전자수입인지 납부확인증", copies: "1부(원본)", note: "매매계약서에 첨부한 상태로 지참, 1회만 출력되므로 여분 없음" },
+        { group: "신청서류", label: "소유권이전등기신청서", copies: "1부(원본)", note: "등기필정보 기재·간인 완료" },
+        { group: "신청서류", label: "등기신청 위임장", copies: "2부(원본)", note: "날인 완료, 여분 포함" }
       ], checklist: [
         "매수인 신분증·도장 지참"
       ], deepDive: {
@@ -1620,25 +1623,41 @@ function wireCalculators(calculators) {
 
 // 단계별 "챙길 서류"를 체크박스가 달린 표(서류/부수/비고)로 렌더링한다. rows: [{ label, copies, note }]
 function renderStepDocTable(s, rows) {
-  return `
-  <div class="step-doc-table-wrap">
+  const renderRows = (items) => items.map(({ r, ri }) => {
+    const itemId = `${s.id}__doc${ri}`;
+    const checked = state.checked[itemId];
+    return `
+    <tr>
+      <td class="doc-check-cell"><input type="checkbox" class="no-print" data-doc="${esc(itemId)}" ${checked ? "checked" : ""}></td>
+      <td><span class="doc-label ${checked ? "done" : ""}">${linkify(r.label)}</span></td>
+      <td class="doc-copies-cell">${esc(r.copies)}</td>
+      <td class="doc-note-cell">${r.note ? linkify(r.note) : ""}</td>
+    </tr>`;
+  }).join("");
+  const renderTable = (items) => `
     <table class="step-doc-table">
       <thead><tr><th></th><th>서류</th><th>부수</th><th>비고</th></tr></thead>
-      <tbody>
-        ${rows.map((r, ri) => {
-          const itemId = `${s.id}__doc${ri}`;
-          const checked = state.checked[itemId];
-          return `
-          <tr>
-            <td class="doc-check-cell"><input type="checkbox" class="no-print" data-doc="${esc(itemId)}" ${checked ? "checked" : ""}></td>
-            <td><span class="doc-label ${checked ? "done" : ""}">${linkify(r.label)}</span></td>
-            <td class="doc-copies-cell">${esc(r.copies)}</td>
-            <td class="doc-note-cell">${r.note ? linkify(r.note) : ""}</td>
-          </tr>`;
-        }).join("")}
-      </tbody>
-    </table>
-  </div>`;
+      <tbody>${renderRows(items)}</tbody>
+    </table>`;
+
+  // group 필드가 없으면 예전처럼 표 하나로, 있으면 그룹별 소제목 + 표로 나눠 보여준다
+  const groups = [];
+  const groupIndexOf = {};
+  rows.forEach((r, ri) => {
+    const key = r.group || "";
+    if (!(key in groupIndexOf)) { groupIndexOf[key] = groups.length; groups.push({ label: key, items: [] }); }
+    groups[groupIndexOf[key]].items.push({ r, ri });
+  });
+
+  if (groups.length === 1 && !groups[0].label) {
+    return `<div class="step-doc-table-wrap">${renderTable(groups[0].items)}</div>`;
+  }
+  return groups.map(g => `
+    <div class="step-doc-group">
+      ${g.label ? `<div class="doc-group-label">${esc(g.label)}</div>` : ""}
+      <div class="step-doc-table-wrap">${renderTable(g.items)}</div>
+    </div>
+  `).join("");
 }
 
 const state = { view: "home", typeId: null, questionIndex: 0, answers: {}, checked: {} };
