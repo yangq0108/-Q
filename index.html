@@ -321,7 +321,7 @@
     color: #64748b;
     font-weight: 700;
     font-size: 11px;
-    text-align: left;
+    text-align: center;
     padding: 7px 10px;
     border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
@@ -331,20 +331,24 @@
   table.step-doc-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; overflow-wrap: break-word; }
   table.step-doc-table tbody tr:last-child td { border-bottom: none; }
   table.step-doc-table tbody tr:hover td { background: #f8fafc; }
+  /* 그룹(예: 매수인 지참 서류 / 매도인에게 받을 서류)이 바뀌는 첫 행은 위 경계선을 진하게 줘서 확실히 구분한다 */
+  table.step-doc-table tr.doc-group-start td { border-top: 2px solid #cbd5e1; }
   table.step-doc-table td.doc-group-cell {
     background: #f8fafc;
     border-right: 1px solid #e2e8f0;
     font-size: 11px;
     font-weight: 700;
     color: #64748b;
+    text-align: center;
     vertical-align: middle;
   }
-  table.step-doc-table td.doc-check-cell { padding-right: 0; }
-  table.step-doc-table td.doc-check-cell input { margin: 2px 0 0; }
-  table.step-doc-table td.doc-copies-cell { white-space: nowrap; font-weight: 700; color: var(--primary, #1d4ed8); }
-  table.step-doc-table td.doc-note-cell, table.step-doc-table td.doc-usage-cell { color: #64748b; font-size: 12.5px; line-height: 1.5; }
+  table.step-doc-table td.doc-check-cell { padding-right: 0; text-align: center; }
+  table.step-doc-table td.doc-check-cell input { margin: 2px auto 0; display: block; }
+  table.step-doc-table td.doc-copies-cell { white-space: nowrap; font-weight: 700; color: var(--primary, #1d4ed8); text-align: center; }
+  table.step-doc-table td.doc-note-cell { color: #64748b; font-size: 12.5px; line-height: 1.5; }
   table.step-doc-table .doc-label { font-weight: 500; color: #0f172a; }
   table.step-doc-table .doc-label.done { text-decoration: line-through; color: #94a3b8; }
+  .doc-usage-inline { margin-top: 6px; padding-left: 8px; border-left: 2px solid #bfdbfe; }
   ul.doc-usage-list-compact { margin: 0; padding-left: 14px; }
   ul.doc-usage-list-compact li { margin-bottom: 3px; line-height: 1.5; }
   ul.doc-usage-list-compact li:last-child { margin-bottom: 0; }
@@ -1639,8 +1643,7 @@ function wireCalculators(calculators) {
 function renderDocTable(idPrefix, rows) {
   const grouped = rows.some(r => r.group);
   const showCopies = rows.some(r => r.copies);
-  const showNote = rows.some(r => r.note);
-  const showUsage = rows.some(r => r.usage && r.usage.length);
+  const showNote = rows.some(r => (r.note || (r.usage && r.usage.length)));
 
   const cols = [];
   if (grouped) cols.push(`<col style="width:84px">`);
@@ -1648,20 +1651,19 @@ function renderDocTable(idPrefix, rows) {
   cols.push(`<col>`);
   if (showCopies) cols.push(`<col style="width:60px">`);
   if (showNote) cols.push(`<col>`);
-  if (showUsage) cols.push(`<col>`);
 
   const headers = [
     grouped ? "<th>구분</th>" : "",
     "<th></th>",
     "<th>서류</th>",
     showCopies ? "<th>부수</th>" : "",
-    showNote ? "<th>비고</th>" : "",
-    showUsage ? "<th>활용</th>" : ""
+    showNote ? "<th>비고</th>" : ""
   ].join("");
 
   const groupCounts = {};
   rows.forEach(r => { const k = r.group || ""; groupCounts[k] = (groupCounts[k] || 0) + 1; });
   const seen = {};
+  let prevKey = null;
 
   const bodyRows = rows.map((r, ri) => {
     const itemId = r.id || `${idPrefix}__doc${ri}`;
@@ -1671,14 +1673,22 @@ function renderDocTable(idPrefix, rows) {
     if (grouped) {
       if (!seen[key]) { seen[key] = true; groupCell = `<td class="doc-group-cell" rowspan="${groupCounts[key]}">${esc(key)}</td>`; }
     }
+    const isGroupStart = grouped && prevKey !== null && key !== prevKey;
+    prevKey = key;
     return `
-    <tr>
+    <tr class="${isGroupStart ? "doc-group-start" : ""}">
       ${groupCell}
       <td class="doc-check-cell"><input type="checkbox" class="no-print" data-doc="${esc(itemId)}" ${checked ? "checked" : ""}></td>
       <td><span class="doc-label ${checked ? "done" : ""}">${linkify(r.label)}</span></td>
       ${showCopies ? `<td class="doc-copies-cell">${r.copies ? esc(r.copies) : ""}</td>` : ""}
-      ${showNote ? `<td class="doc-note-cell">${r.note ? linkify(r.note) : ""}</td>` : ""}
-      ${showUsage ? `<td class="doc-usage-cell">${r.usage && r.usage.length ? `<ul class="doc-usage-list-compact">${r.usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>` : ""}</td>` : ""}
+      ${showNote ? `<td class="doc-note-cell">
+        ${r.note ? linkify(r.note) : ""}
+        ${r.usage && r.usage.length ? `
+        <div class="doc-usage-inline">
+          <div class="doc-usage-label">활용</div>
+          <ul class="doc-usage-list-compact">${r.usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>
+        </div>` : ""}
+      </td>` : ""}
     </tr>`;
   }).join("");
 
