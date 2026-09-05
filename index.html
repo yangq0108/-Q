@@ -1647,9 +1647,9 @@ function renderDocTable(idPrefix, rows) {
   const showNote = rows.some(r => (r.note || (r.usage && r.usage.length)));
 
   const cols = [];
-  if (grouped) cols.push(`<col style="width:96px">`);
+  if (grouped) cols.push(`<col style="width:120px">`);
   cols.push(`<col style="width:28px">`);
-  cols.push(`<col>`);
+  cols.push(showNote ? `<col style="width:150px">` : `<col>`);
   if (showCopies) cols.push(`<col style="width:60px">`);
   if (showNote) cols.push(`<col>`);
 
@@ -1924,7 +1924,7 @@ function renderResult() {
   ` : "";
 
   const docRows = groups.flatMap(group => group.items.map(d => ({
-    id: d.id, group: group.label, label: d.label, note: d.note, usage: d.usage
+    id: d.id, group: group.label, label: d.label, note: d.note
   })));
   const groupsHtml = renderDocTable("maindoc", docRows);
 
