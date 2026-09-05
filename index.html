@@ -375,12 +375,12 @@
   .deepdive-trigger:hover { background: #dbeafe; }
 
   /* 결과 화면: 왼쪽에 전체 체크리스트, 오른쪽에는 화면 전체 높이를 쓰는 "자세히 보기" 전용 패널 */
-  .wizard-wrap.wrap-wide { max-width: 1360px; }
+  .wizard-wrap.wrap-wide { max-width: 1420px; }
   .result-grid { display: block; }
   @media (min-width: 1100px) {
     .result-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 380px;
+      grid-template-columns: minmax(0, 1fr) 460px;
       gap: 24px;
       align-items: start;
     }
@@ -471,7 +471,7 @@
   .dd-table-note { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.5; }
   /* 요율표(숫자, 오른쪽 정렬)와 달리 절차 설명 표는 줄바꿈되는 왼쪽 정렬 텍스트로 보여준다 */
   table.dd-table.dd-table--wrap { table-layout: fixed; white-space: normal; }
-  table.dd-table.dd-table--wrap th { text-align: left; }
+  table.dd-table.dd-table--wrap th { text-align: center; }
   table.dd-table.dd-table--wrap td { text-align: left; overflow-wrap: break-word; }
   table.dd-table.dd-table--wrap td:first-child { text-align: center; font-weight: 700; color: var(--primary, #1d4ed8); }
   table.dd-table.dd-table--wrap td:nth-child(2) { font-weight: 600; color: #0f172a; }
@@ -861,7 +861,7 @@ const REGISTRATION_TYPES = [
         { label: "출력한 신청서 원본 보관", usage: ["잔금 후 등기필정보를 마저 적어 등기소 접수(s7) 때 그대로 제출"] }
       ], deepDive: {
         tables: [
-          { wrap: true, title: "e-Form 작성 단계별 화면", headers: ["단계", "화면", "할 일"], colWidths: ["36px", "150px", ""], rows: [
+          { wrap: true, title: "e-Form 작성 단계별 화면", headers: ["단계", "화면", "할 일"], colWidths: ["40px", "104px", ""], rows: [
             ["1", "제출방식 및 이용동의", "제출방식은 기본값인 '이폼(e-Form)'을 그대로 두고, 안내문을 읽은 뒤 이용동의에 체크한다. 여기서 작성한 신청서는 출력해서 관할 등기소에 직접 제출해야 한다는 점을 기억해둔다."],
             ["2", "등기유형/원인/부동산표시", "'전체유형 검색' → 팝업에서 '보존/이전/설정' 중 '소유권이전' 선택. '부동산 입력'에서 등기부등본 우측 상단의 '고유번호' 14자리를 넣어 부동산을 특정한다. 이어서 등기원인 연월일(계약일), 잔금납부일을 입력하고, '거래가액 입력' 팝업에서 신고필증 하단의 거래신고관리번호와 거래가액을 넣는다."],
             ["3", "등기할 사항", "등기의무자(=매도인)를 선택하고 이전할 지분(단독→단독 1분의1, 공동 관련 지분은 상황별로 다름)을 입력한다. 등기필정보(일련번호·비밀번호)는 잔금 전인 지금은 비워두고 '닫기'로 넘어가도 된다 — 잔금날 등기필증을 받은 뒤 채워 넣으면 된다. 이어서 등기권리자(=매수인=신청인 본인) 정보와 지분을 입력한다."],
