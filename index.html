@@ -469,6 +469,12 @@
   table.dd-table tbody tr:last-child td { border-bottom: none; }
   table.dd-table tbody tr:hover td { background: #f8fafc; }
   .dd-table-note { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.5; }
+  /* 요율표(숫자, 오른쪽 정렬)와 달리 절차 설명 표는 줄바꿈되는 왼쪽 정렬 텍스트로 보여준다 */
+  table.dd-table.dd-table--wrap { table-layout: fixed; white-space: normal; }
+  table.dd-table.dd-table--wrap th { text-align: left; }
+  table.dd-table.dd-table--wrap td { text-align: left; overflow-wrap: break-word; }
+  table.dd-table.dd-table--wrap td:first-child { text-align: center; font-weight: 700; color: var(--primary, #1d4ed8); }
+  table.dd-table.dd-table--wrap td:nth-child(2) { font-weight: 600; color: #0f172a; }
 
   /* 거래금액·시가표준액을 입력하면 인지세·채권매입액을 바로 계산해주는 미니 계산기 */
   .dd-calc {
@@ -854,12 +860,16 @@ const REGISTRATION_TYPES = [
         "부동산 고유번호 확인 (등기부등본 우측 상단 14자리)",
         { label: "출력한 신청서 원본 보관", usage: ["잔금 후 등기필정보를 마저 적어 등기소 접수(s7) 때 그대로 제출"] }
       ], deepDive: {
+        tables: [
+          { wrap: true, title: "e-Form 작성 단계별 화면", headers: ["단계", "화면", "할 일"], colWidths: ["36px", "150px", ""], rows: [
+            ["1", "제출방식 및 이용동의", "제출방식은 기본값인 '이폼(e-Form)'을 그대로 두고, 안내문을 읽은 뒤 이용동의에 체크한다. 여기서 작성한 신청서는 출력해서 관할 등기소에 직접 제출해야 한다는 점을 기억해둔다."],
+            ["2", "등기유형/원인/부동산표시", "'전체유형 검색' → 팝업에서 '보존/이전/설정' 중 '소유권이전' 선택. '부동산 입력'에서 등기부등본 우측 상단의 '고유번호' 14자리를 넣어 부동산을 특정한다. 이어서 등기원인 연월일(계약일), 잔금납부일을 입력하고, '거래가액 입력' 팝업에서 신고필증 하단의 거래신고관리번호와 거래가액을 넣는다."],
+            ["3", "등기할 사항", "등기의무자(=매도인)를 선택하고 이전할 지분(단독→단독 1분의1, 공동 관련 지분은 상황별로 다름)을 입력한다. 등기필정보(일련번호·비밀번호)는 잔금 전인 지금은 비워두고 '닫기'로 넘어가도 된다 — 잔금날 등기필증을 받은 뒤 채워 넣으면 된다. 이어서 등기권리자(=매수인=신청인 본인) 정보와 지분을 입력한다."],
+            ["4", "수수료등 입력", "'국민주택채권매입액 입력'에서 시가표준액(공시가격), 채권매입액, 채권발행번호를 넣는다. 등록면허세(취득세)는 거래금액 기준으로 자동 계산되는 계산기를 활용하고, '납부정보 입력'에서 등기신청수수료 전자납부 영수증의 납부번호를 입력한다."],
+            ["5", "첨부서면 및 연계정보", "실제로 들고 갈 서류 11종(매매계약서, 신고필증, 집합건축물대장, 토지/임야대장, 위임장, 등기필증, 인감증명서, 의무자·권리자 주민등록정보, 등록면허세·취득세 영수필확인서)을 각 1통씩 체크한 뒤 '작성완료 및 확인'을 누른다."]
+          ] }
+        ],
         list: [
-          "1단계 · 제출방식 및 이용동의 — 제출방식은 기본값인 '이폼(e-Form)'을 그대로 두고, 안내문을 읽은 뒤 이용동의에 체크한다. 여기서 작성한 신청서는 출력해서 관할 등기소에 직접 제출해야 한다는 점을 기억해둔다.",
-          "2단계 · 등기유형/원인/부동산표시 — '전체유형 검색' → 팝업에서 '보존/이전/설정' 중 '소유권이전' 선택. '부동산 입력'에서 등기부등본 우측 상단의 '고유번호' 14자리를 넣어 부동산을 특정한다. 이어서 등기원인 연월일(계약일), 잔금납부일을 입력하고, '거래가액 입력' 팝업에서 신고필증 하단의 거래신고관리번호와 거래가액을 넣는다.",
-          "3단계 · 등기할 사항 — 등기의무자(=매도인)를 선택하고 이전할 지분(단독→단독 1분의1, 공동 관련 지분은 상황별로 다름)을 입력한다. 등기필정보(일련번호·비밀번호)는 잔금 전인 지금은 비워두고 '닫기'로 넘어가도 된다 — 잔금날 등기필증을 받은 뒤 채워 넣으면 된다. 이어서 등기권리자(=매수인=신청인 본인) 정보와 지분을 입력한다.",
-          "4단계 · 수수료등 입력 — '국민주택채권매입액 입력'에서 시가표준액(공시가격), 채권매입액, 채권발행번호를 넣는다. 등록면허세(취득세)는 거래금액 기준으로 자동 계산되는 계산기를 활용하고, '납부정보 입력'에서 등기신청수수료 전자납부 영수증의 납부번호를 입력한다.",
-          "5단계 · 첨부서면 및 연계정보 — 실제로 들고 갈 서류 11종(매매계약서, 신고필증, 집합건축물대장, 토지/임야대장, 위임장, 등기필증, 인감증명서, 의무자·권리자 주민등록정보, 등록면허세·취득세 영수필확인서)을 각 1통씩 체크한 뒤 '작성완료 및 확인'을 누른다.",
           "마지막으로 전체 내용을 다시 확인하고 '신청서 출력'과 '위임장 출력'을 각각 눌러 인쇄한다 (다시 검토하려면 PDF로 먼저 저장해두면 편하다)."
         ],
         links: [{ label: "대법원 인터넷등기소", url: "http://www.iros.go.kr" }]
@@ -884,8 +894,8 @@ const REGISTRATION_TYPES = [
       { id: "s3", title: "잔금 지급 및 서류 수령", description: "잔금 지급과 동시에 매도인으로부터 등기에 필요한 서류를 받는다. (여기서 미리 출력해온 위임장에 매도인 인감도장을 받는다)", details: [
         "잔금일 직전 등기부등본을 재발급해 새로운 근저당·가압류 등 권리 변동이 없는지 최종 확인한다."
       ], checklistTable: [
-        { group: "매수인 지참 서류", label: "등기신청 위임장 (e-Form 출력본, 여분 포함)", copies: "2부", note: "매도인 인감도장 날인 받기" },
-        { group: "매수인 지참 서류", label: "소유권이전등기신청서 사본", copies: "1부", note: "참고용으로 지참" },
+        { group: "매수인 지참 서류", label: "등기신청 위임장", copies: "2부", note: "e-Form 출력본, 여분 포함 — 매도인 인감도장 날인 받기" },
+        { group: "매수인 지참 서류", label: "소유권이전등기신청서", copies: "1부", note: "사본, 참고용으로 지참" },
         { group: "매도인에게 받을 서류", label: "등기필증(또는 등기필정보)", copies: "1부", note: "" },
         { group: "매도인에게 받을 서류", label: "인감증명서(매도용)", copies: "1부", note: "" },
         { group: "매도인에게 받을 서류", label: "주민등록초본", copies: "1부", note: "" },
@@ -1115,7 +1125,7 @@ const REGISTRATION_TYPES = [
           individual: {
             documents: [
               { id: "individual-seal-cert", label: "인감증명서 및 인감도장 날인 서류", category: "creditor", note: "근저당권자 개인 명의" },
-              { id: "individual-id", label: "신분증 사본", category: "creditor", note: "근저당권자 개인 명의" }
+              { id: "individual-id", label: "신분증", category: "creditor", note: "사본, 근저당권자 개인 명의" }
             ],
             warnings: [
               "근저당권자가 개인인 경우 서류 발급을 강제할 방법이 마땅치 않으므로, 완제 확인서(영수증)를 받아두고 협조를 미리 구해야 합니다."
@@ -1530,13 +1540,17 @@ function calcBond(amount, region, kind) {
 
 // 인지세·국민주택채권 매입기준율표처럼 구간별 수치가 여러 개 나열되는 정보를 표로 렌더링한다
 function renderRateTable(t) {
+  // t.wrap: true면 숫자 요율표 대신 절차 설명처럼 줄바꿈되는 왼쪽 정렬 텍스트 표로 렌더링한다.
+  // t.colWidths: 각 열 너비(px 문자열). 빈 값이면 그 열이 남는 공간을 가져간다.
+  const colgroup = t.colWidths ? `<colgroup>${t.colWidths.map(w => w ? `<col style="width:${w}">` : `<col>`).join("")}</colgroup>` : "";
   return `
     <div class="dd-table-wrap">
       ${t.title ? `<div class="dd-table-title">${esc(t.title)}</div>` : ""}
       <div class="dd-table-scroll">
-        <table class="dd-table">
+        <table class="dd-table${t.wrap ? " dd-table--wrap" : ""}">
+          ${colgroup}
           <thead><tr>${t.headers.map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead>
-          <tbody>${t.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody>
+          <tbody>${t.rows.map(r => `<tr>${r.map(c => `<td>${linkify(c)}</td>`).join("")}</tr>`).join("")}</tbody>
         </table>
       </div>
       ${t.note ? `<div class="dd-table-note">${linkify(t.note)}</div>` : ""}
