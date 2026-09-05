@@ -296,7 +296,7 @@
   .step-details li:last-child { margin-bottom: 0; }
   .step-checklist { margin-top: 10px; }
   .step-checklist-label { font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
-  .step-checklist .doc-list { border-radius: 10px; }
+  .step-checklist .doc-list { border-radius: 10px; font-size: 13px; }
   .doc-usage { margin-top: 6px; border-left: 2px solid #bfdbfe; padding-left: 10px; }
   .doc-usage-label {
     display: inline-block;
@@ -312,12 +312,10 @@
   .doc-usage-list li { margin-bottom: 3px; line-height: 1.5; }
   .doc-usage-list li:last-child { margin-bottom: 0; }
 
-  /* 잔금 지급·등기소 접수처럼 "서류 + 부수 + 비고"를 한눈에 봐야 하는 단계는 체크박스 달린 표로 보여준다 */
-  .step-doc-group { margin-bottom: 14px; }
-  .step-doc-group:last-child { margin-bottom: 0; }
-  .step-doc-group .doc-group-label { font-size: 12px; margin-bottom: 6px; }
+  /* 필요 서류·잔금 지급·등기소 접수처럼 "서류 + 부수 + 비고/활용"을 한눈에 봐야 하는 목록은
+     체크박스 달린 표로 보여준다. <colgroup>이 열 너비를 고정해 표마다 폭이 들쭉날쭉해지지 않는다. */
   .step-doc-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
-  table.step-doc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.step-doc-table { table-layout: fixed; width: 100%; border-collapse: collapse; font-size: 13px; }
   table.step-doc-table th {
     background: #f8fafc;
     color: #64748b;
@@ -327,16 +325,29 @@
     padding: 7px 10px;
     border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  table.step-doc-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  table.step-doc-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; vertical-align: top; overflow-wrap: break-word; }
   table.step-doc-table tbody tr:last-child td { border-bottom: none; }
   table.step-doc-table tbody tr:hover td { background: #f8fafc; }
-  table.step-doc-table td.doc-check-cell { width: 20px; padding-right: 0; }
+  table.step-doc-table td.doc-group-cell {
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    vertical-align: middle;
+  }
+  table.step-doc-table td.doc-check-cell { padding-right: 0; }
   table.step-doc-table td.doc-check-cell input { margin: 2px 0 0; }
-  table.step-doc-table td.doc-copies-cell { width: 56px; white-space: nowrap; font-weight: 700; color: var(--primary, #1d4ed8); }
-  table.step-doc-table td.doc-note-cell { color: #64748b; font-size: 12.5px; line-height: 1.5; }
+  table.step-doc-table td.doc-copies-cell { white-space: nowrap; font-weight: 700; color: var(--primary, #1d4ed8); }
+  table.step-doc-table td.doc-note-cell, table.step-doc-table td.doc-usage-cell { color: #64748b; font-size: 12.5px; line-height: 1.5; }
   table.step-doc-table .doc-label { font-weight: 500; color: #0f172a; }
   table.step-doc-table .doc-label.done { text-decoration: line-through; color: #94a3b8; }
+  ul.doc-usage-list-compact { margin: 0; padding-left: 14px; }
+  ul.doc-usage-list-compact li { margin-bottom: 3px; line-height: 1.5; }
+  ul.doc-usage-list-compact li:last-child { margin-bottom: 0; }
   .doc-note a, .step-desc a, .step-details a, .warning-box a {
     color: #1d4ed8;
     text-decoration: underline;
@@ -1621,43 +1632,64 @@ function wireCalculators(calculators) {
   });
 }
 
-// 단계별 "챙길 서류"를 체크박스가 달린 표(서류/부수/비고)로 렌더링한다. rows: [{ label, copies, note }]
-function renderStepDocTable(s, rows) {
-  const renderRows = (items) => items.map(({ r, ri }) => {
-    const itemId = `${s.id}__doc${ri}`;
+// 체크박스가 달린 서류 표. rows: [{ id?, group?, label, copies?, note?, usage? }]
+// - group이 있으면 표 왼쪽에 rowspan으로 묶은 "구분" 열을 추가한다 (그룹마다 표를 따로 만들지 않음).
+// - copies/note/usage는 있는 행이 하나라도 있을 때만 해당 열 자체를 만든다.
+// - <colgroup>으로 열 너비를 고정해, 표마다 내용 길이가 달라도 같은 이름의 열은 항상 같은 폭으로 보이게 한다.
+function renderDocTable(idPrefix, rows) {
+  const grouped = rows.some(r => r.group);
+  const showCopies = rows.some(r => r.copies);
+  const showNote = rows.some(r => r.note);
+  const showUsage = rows.some(r => r.usage && r.usage.length);
+
+  const cols = [];
+  if (grouped) cols.push(`<col style="width:84px">`);
+  cols.push(`<col style="width:28px">`);
+  cols.push(`<col>`);
+  if (showCopies) cols.push(`<col style="width:60px">`);
+  if (showNote) cols.push(`<col>`);
+  if (showUsage) cols.push(`<col>`);
+
+  const headers = [
+    grouped ? "<th>구분</th>" : "",
+    "<th></th>",
+    "<th>서류</th>",
+    showCopies ? "<th>부수</th>" : "",
+    showNote ? "<th>비고</th>" : "",
+    showUsage ? "<th>활용</th>" : ""
+  ].join("");
+
+  const groupCounts = {};
+  rows.forEach(r => { const k = r.group || ""; groupCounts[k] = (groupCounts[k] || 0) + 1; });
+  const seen = {};
+
+  const bodyRows = rows.map((r, ri) => {
+    const itemId = r.id || `${idPrefix}__doc${ri}`;
     const checked = state.checked[itemId];
+    const key = r.group || "";
+    let groupCell = "";
+    if (grouped) {
+      if (!seen[key]) { seen[key] = true; groupCell = `<td class="doc-group-cell" rowspan="${groupCounts[key]}">${esc(key)}</td>`; }
+    }
     return `
     <tr>
+      ${groupCell}
       <td class="doc-check-cell"><input type="checkbox" class="no-print" data-doc="${esc(itemId)}" ${checked ? "checked" : ""}></td>
       <td><span class="doc-label ${checked ? "done" : ""}">${linkify(r.label)}</span></td>
-      <td class="doc-copies-cell">${esc(r.copies)}</td>
-      <td class="doc-note-cell">${r.note ? linkify(r.note) : ""}</td>
+      ${showCopies ? `<td class="doc-copies-cell">${r.copies ? esc(r.copies) : ""}</td>` : ""}
+      ${showNote ? `<td class="doc-note-cell">${r.note ? linkify(r.note) : ""}</td>` : ""}
+      ${showUsage ? `<td class="doc-usage-cell">${r.usage && r.usage.length ? `<ul class="doc-usage-list-compact">${r.usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>` : ""}</td>` : ""}
     </tr>`;
   }).join("");
-  const renderTable = (items) => `
+
+  return `
+  <div class="step-doc-table-wrap">
     <table class="step-doc-table">
-      <thead><tr><th></th><th>서류</th><th>부수</th><th>비고</th></tr></thead>
-      <tbody>${renderRows(items)}</tbody>
-    </table>`;
-
-  // group 필드가 없으면 예전처럼 표 하나로, 있으면 그룹별 소제목 + 표로 나눠 보여준다
-  const groups = [];
-  const groupIndexOf = {};
-  rows.forEach((r, ri) => {
-    const key = r.group || "";
-    if (!(key in groupIndexOf)) { groupIndexOf[key] = groups.length; groups.push({ label: key, items: [] }); }
-    groups[groupIndexOf[key]].items.push({ r, ri });
-  });
-
-  if (groups.length === 1 && !groups[0].label) {
-    return `<div class="step-doc-table-wrap">${renderTable(groups[0].items)}</div>`;
-  }
-  return groups.map(g => `
-    <div class="step-doc-group">
-      ${g.label ? `<div class="doc-group-label">${esc(g.label)}</div>` : ""}
-      <div class="step-doc-table-wrap">${renderTable(g.items)}</div>
-    </div>
-  `).join("");
+      <colgroup>${cols.join("")}</colgroup>
+      <thead><tr>${headers}</tr></thead>
+      <tbody>${bodyRows}</tbody>
+    </table>
+  </div>`;
 }
 
 const state = { view: "home", typeId: null, questionIndex: 0, answers: {}, checked: {} };
@@ -1880,27 +1912,10 @@ function renderResult() {
     </div>
   ` : "";
 
-  const groupsHtml = groups.map(group => `
-    <div class="doc-group">
-      <div class="doc-group-label">${esc(group.label)}</div>
-      <ul class="doc-list">
-        ${group.items.map(d => `
-          <li>
-            <input type="checkbox" class="no-print" data-doc="${esc(d.id)}" ${state.checked[d.id] ? "checked" : ""}>
-            <div>
-              <div class="doc-label ${state.checked[d.id] ? "done" : ""}">${esc(d.label)}</div>
-              ${d.note ? `<div class="doc-note">${linkify(d.note)}</div>` : ""}
-              ${d.usage && d.usage.length ? `
-              <div class="doc-usage">
-                <div class="doc-usage-label">활용</div>
-                <ul class="doc-usage-list">${d.usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>
-              </div>` : ""}
-            </div>
-          </li>
-        `).join("")}
-      </ul>
-    </div>
-  `).join("");
+  const docRows = groups.flatMap(group => group.items.map(d => ({
+    id: d.id, group: group.label, label: d.label, note: d.note, usage: d.usage
+  })));
+  const groupsHtml = renderDocTable("maindoc", docRows);
 
   const stepsHtml = checklist.steps.map((s, i) => `
     <li>
@@ -1912,7 +1927,7 @@ function renderResult() {
         ${s.checklistTable && s.checklistTable.length ? `
         <div class="step-checklist">
           <div class="step-checklist-label">챙길 서류</div>
-          ${renderStepDocTable(s, s.checklistTable)}
+          ${renderDocTable(s.id, s.checklistTable)}
         </div>` : ""}
         ${s.checklist && s.checklist.length ? `
         <div class="step-checklist">
