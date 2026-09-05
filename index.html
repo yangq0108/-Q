@@ -298,6 +298,8 @@
   .step-checklist { margin-top: 10px; }
   .step-checklist-label { font-size: 12px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
   .step-checklist .doc-list { border-radius: 10px; font-size: 13px; }
+  .step-checklist .doc-list > li { padding: 8px 12px; gap: 8px; }
+  .step-checklist .doc-list input[type="checkbox"] { margin-top: 1px; }
   .doc-usage { margin-top: 6px; border-left: 2px solid #bfdbfe; padding-left: 10px; }
   .doc-usage-label {
     display: inline-block;
@@ -719,7 +721,7 @@ const REGISTRATION_TYPES = [
       { id: "land-register", label: "토지대장", category: "property", note: "정부24(gov.kr)에서 '토지(임야)대장등본발급(대지권등록부)'로 발급. 부동산등기규칙상 발급일로부터 3개월 이내여야 하므로 등기 접수일에 임박해 발급" },
       { id: "building-register", label: "건축물대장", category: "property", note: "정부24(gov.kr)에서 발급 (집합건물은 대장구분 '집합' · 대장종류 '전유부'로 발급). 토지대장과 마찬가지로 발급일로부터 3개월 이내여야 함" },
       { id: "registry-cert-latest", label: "등기사항전부증명서(등기부등본) 최신본", category: "property", note: "법령상 정해진 유효기간은 없으나, 최신 권리관계 확인이 목적이므로 잔금일 직전(가능하면 당일) 재발급하여 권리관계 최종 확인" },
-      { id: "seller-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "seller", note: "분실 시 재발급이 안 되므로 등기소 동행 등 별도 확인 절차가 필요할 수 있음" },
+      { id: "seller-registry-title", label: "등기필증(권리증)", category: "seller", note: "분실 시 재발급이 안 되므로 등기소 동행 등 별도 확인 절차가 필요할 수 있음" },
       { id: "seller-seal-cert", label: "인감증명서 (매도용)", category: "seller", note: "매수인 인적사항이 기재된 '부동산 매도용'으로 발급 요청. 인감도장과 도장이 일치하는지, 매수인 인적사항이 맞는지 잔금일 현장에서 대조. 발급일로부터 3개월 이내여야 함" },
       { id: "seller-abstract", label: "주민등록초본", category: "seller", note: "3개월 이내 발급, 주소 변동 이력 포함·주민등록번호 전체 표시로 발급. '계약서상 주소 = 초본 마지막 주소 = 인감증명서 주소 = 위임장 위임인 주소 = 등기신청서 의무자 주소'가 모두 일치해야 함" },
       { id: "seller-seal-stamp", label: "인감도장 날인 서류 일체", category: "seller" },
@@ -896,7 +898,7 @@ const REGISTRATION_TYPES = [
       ], checklistTable: [
         { group: "매수인 지참 서류", label: "등기신청 위임장", copies: "2부", note: "e-Form 출력본, 여분 포함 — 매도인 인감도장 날인 받기" },
         { group: "매수인 지참 서류", label: "소유권이전등기신청서", copies: "1부", note: "사본, 참고용으로 지참" },
-        { group: "매도인에게 받을 서류", label: "등기필증(또는 등기필정보)", copies: "1부", note: "" },
+        { group: "매도인에게 받을 서류", label: "등기필증(권리증)", copies: "1부", note: "" },
         { group: "매도인에게 받을 서류", label: "인감증명서(매도용)", copies: "1부", note: "" },
         { group: "매도인에게 받을 서류", label: "주민등록초본", copies: "1부", note: "" },
         { group: "정산·영수증", label: "잔금 영수증", copies: "1부", note: "매도인에게서 수령, 분쟁 대비 보관" },
@@ -919,7 +921,7 @@ const REGISTRATION_TYPES = [
         { group: "공통·물건 서류", label: "부동산거래계약 신고필증", copies: "1부(원본)", note: "e-Form 입력에 쓴 나머지 1부는 이미 목적을 다함 — 제출은 이 1부만" },
         { group: "공통·물건 서류", label: "건축물대장", copies: "1부(원본)", note: "" },
         { group: "공통·물건 서류", label: "토지대장", copies: "1부(원본)", note: "" },
-        { group: "매도인 서류", label: "등기필증(또는 등기필정보)", copies: "1부", note: "" },
+        { group: "매도인 서류", label: "등기필증(권리증)", copies: "1부", note: "" },
         { group: "매도인 서류", label: "인감증명서(매도용)", copies: "1부", note: "" },
         { group: "매도인 서류", label: "주민등록초본", copies: "1부", note: "" },
         { group: "매수인 서류", label: "주민등록등본(또는 초본)", copies: "1부", note: "" },
@@ -927,7 +929,7 @@ const REGISTRATION_TYPES = [
         { group: "세금·비용 서류", label: "국민주택채권 매입영수증", copies: "1부(원본)", note: "채권발행번호 확인 — 공동명의라면 지분별 영수증 2부" },
         { group: "세금·비용 서류", label: "등기신청수수료 전자납부확인서", copies: "1부(원본)", note: "납부번호 확인" },
         { group: "세금·비용 서류", label: "전자수입인지 납부확인증", copies: "1부(원본)", note: "매매계약서에 첨부한 상태로 지참, 1회만 출력되므로 여분 없음" },
-        { group: "신청서류", label: "소유권이전등기신청서", copies: "1부(원본)", note: "등기필정보 기재·간인 완료" },
+        { group: "신청서류", label: "소유권이전등기신청서", copies: "1부(원본)", note: "등기필정보 기재 완료, 여러 장이면 모든 페이지에 도장으로 간인(앞장을 접어 뒷장과 겹쳐 찍음) 완료" },
         { group: "신청서류", label: "등기신청 위임장", copies: "2부(원본)", note: "날인 완료, 여분 포함" }
       ], checklist: [
         "매수인 신분증·도장 지참"
@@ -1164,7 +1166,7 @@ const REGISTRATION_TYPES = [
     ],
     baseDocuments: [
       { id: "jeonse-contract", label: "전세권설정계약서", category: "common", note: "전세금액, 존속기간, 목적물 범위 명시" },
-      { id: "landlord-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "landlord" },
+      { id: "landlord-registry-title", label: "등기필증(권리증)", category: "landlord" },
       { id: "landlord-seal-cert", label: "인감증명서", category: "landlord", note: "발급일로부터 3개월 이내여야 함" },
       { id: "landlord-abstract", label: "주민등록초본", category: "landlord", note: "발급일로부터 3개월 이내여야 함" },
       { id: "tenant-resident-doc", label: "주민등록등본", category: "tenant", note: "발급일로부터 3개월 이내여야 함" },
@@ -1184,7 +1186,7 @@ const REGISTRATION_TYPES = [
         { label: "등록면허세 영수필확인서(위택스 '납부확인서') 확보", usage: ["등기소 접수(j4) 시 첨부서류로 원본 제출"] }
       ]},
       { id: "j3", title: "서류 준비", description: "임대인의 협조를 받아 등기필증, 인감증명서 등 첨부서류를 갖춘다.", checklist: [
-        "임대인에게 등기필증(또는 등기필정보) 요청",
+        "임대인에게 등기필증(권리증) 요청",
         "임대인에게 인감증명서(부동산용) 요청",
         "임대인에게 주민등록초본 요청",
         "임차인 주민등록등본 준비",
@@ -1195,7 +1197,7 @@ const REGISTRATION_TYPES = [
         "임대인·임차인이 함께 관할 등기소를 방문해 접수하며, 임대인이 직접 오기 어려우면 위임장(인감날인)으로 대리 접수한다."
       ], checklist: [
         "전세권설정계약서 준비",
-        "임대인 등기필증(또는 등기필정보) 원본",
+        "임대인 등기필증(권리증) 원본",
         "임대인 인감증명서 원본",
         "임대인 주민등록초본 원본",
         "임차인 주민등록등본 준비",
@@ -1247,7 +1249,7 @@ const REGISTRATION_TYPES = [
     ],
     baseDocuments: [
       { id: "gift-contract", label: "증여계약서", category: "common" },
-      { id: "donor-registry-title", label: "등기필증(권리증) 또는 등기필정보", category: "donor" },
+      { id: "donor-registry-title", label: "등기필증(권리증)", category: "donor" },
       { id: "donor-seal-cert", label: "인감증명서 (부동산 증여용)", category: "donor", note: "수증자 인적사항이 기재된 용도로 발급. 발급일로부터 3개월 이내여야 함" },
       { id: "donor-abstract", label: "주민등록초본", category: "donor", note: "발급일로부터 3개월 이내여야 함" },
       { id: "donee-resident-doc", label: "주민등록등본", category: "donee", note: "발급일로부터 3개월 이내여야 함" },
@@ -1278,7 +1280,7 @@ const REGISTRATION_TYPES = [
         "국민주택채권은 취득세와 마찬가지로 위택스 신고 이후 주택도시기금(nhuf.molit.go.kr)에서 증여일 기준 공시가격으로 매입·즉시매도한다. 증여·상속은 매매보다 매입률이 더 높은 별도 요율표를 쓰므로 '자세히 보기'에서 확인한다."
       ], checklist: [
         "증여자 인감증명서(부동산 증여용) 원본 준비",
-        "증여자 등기필증(또는 등기필정보) 원본 준비",
+        "증여자 등기필증(권리증) 원본 준비",
         "수증자 주민등록등본 준비",
         { label: "취득세(증여) 영수필확인서 원본 준비", usage: ["등기소 접수 시 제출"] },
         { label: "국민주택채권 매입영수증 원본 준비 (채권발행번호 확인)", usage: ["채권발행번호는 등기신청서 기재용, 원본은 등기소 접수 시 제출"] }
