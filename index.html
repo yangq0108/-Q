@@ -301,16 +301,6 @@
   .step-checklist .doc-list > li { padding: 8px 12px; gap: 8px; }
   .step-checklist .doc-list input[type="checkbox"] { margin-top: 1px; }
   .doc-usage { margin-top: 6px; border-left: 2px solid #bfdbfe; padding-left: 10px; }
-  .doc-usage-label {
-    display: inline-block;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--primary, #1d4ed8);
-    background: var(--primary-container, #eff6ff);
-    border-radius: 999px;
-    padding: 2px 8px;
-    margin-bottom: 4px;
-  }
   .doc-usage-list { margin: 0; padding-left: 16px; font-size: 12.5px; color: #475569; }
   .doc-usage-list li { margin-bottom: 3px; line-height: 1.5; }
   .doc-usage-list li:last-child { margin-bottom: 0; }
@@ -905,8 +895,8 @@ const REGISTRATION_TYPES = [
         { group: "정산·영수증", label: "중개수수료 현금영수증", copies: "1부", note: "공인중개사에게서 수령, 보관" }
       ], checklist: [
         "매수인 신분증·도장 지참",
-        "인감도장과 인감증명서의 도장이 일치하는지 확인",
-        "계약서·초본·인감증명서·위임장·등기신청서의 주소가 모두 일치하는지 대조",
+        "매도인의 인감도장과 인감증명서(매도용)에 찍힌 도장이 일치하는지 확인",
+        "매도인 관련 주소 일치 여부 대조: 계약서상 주소 = 초본 마지막 주소 = 인감증명서 주소 = 위임장 위임인 주소 = 등기신청서 의무자 주소",
         "장기수선충당금·선수관리비 정산 확인"
       ]},
       { id: "s7", title: "등기소 접수", description: "e-Form으로 작성한 신청서를 출력·날인해 관할 등기소를 방문 제출한다.", details: [
@@ -1702,7 +1692,6 @@ function renderDocTable(idPrefix, rows) {
         ${r.note ? linkify(r.note) : ""}
         ${r.usage && r.usage.length ? `
         <div class="doc-usage-inline">
-          <div class="doc-usage-label">활용</div>
           <ul class="doc-usage-list-compact">${r.usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>
         </div>` : ""}
       </td>` : ""}
@@ -1972,7 +1961,6 @@ function renderResult() {
                   <div class="doc-label ${state.checked[itemId] ? "done" : ""}">${linkify(label)}</div>
                   ${usage && usage.length ? `
                   <div class="doc-usage">
-                    <div class="doc-usage-label">활용</div>
                     <ul class="doc-usage-list">${usage.map(u => `<li>${linkify(u)}</li>`).join("")}</ul>
                   </div>` : ""}
                 </div>
