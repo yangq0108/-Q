@@ -345,6 +345,45 @@
   ul.doc-usage-list-compact { margin: 0; padding-left: 14px; }
   ul.doc-usage-list-compact li { margin-bottom: 3px; line-height: 1.5; }
   ul.doc-usage-list-compact li:last-child { margin-bottom: 0; }
+
+  /* 등기 과정에서 필요한 각종 번호를 적어두고 브라우저에 저장해 계속 조회할 수 있는 메모장 */
+  .ref-panel {
+    margin-top: 24px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .ref-panel-title { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+  .ref-panel-desc { font-size: 12.5px; color: var(--secondary); margin-bottom: 14px; line-height: 1.5; }
+  .ref-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 640px) { .ref-grid { grid-template-columns: 1fr 1fr; } }
+  .ref-field label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; }
+  .ref-field-hint { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+  .ref-input-row { display: flex; gap: 6px; }
+  .ref-input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .ref-input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+  .ref-copy-btn {
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #475569;
+  }
+  .ref-copy-btn:hover { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; }
+  .ref-copy-btn.copied { color: var(--success); border-color: var(--success); }
   .doc-note a, .step-desc a, .step-details a, .warning-box a {
     color: #1d4ed8;
     text-decoration: underline;
@@ -692,6 +731,15 @@ const REGISTRATION_TYPES = [
     title: "매매로 인한 소유권이전등기",
     shortDesc: "집을 사고팔 때, 매수인이 직접 진행하는 소유권 이전 셀프등기",
     who: "매도인과 매수인의 공동신청이 원칙 (실무상 매수인이 서류를 모아 접수)",
+    referenceFields: [
+      { id: "propertyId", label: "부동산 고유번호", placeholder: "14자리 숫자", hint: "등기부등본 우측 상단" },
+      { id: "dealMgmtNo", label: "거래관리번호", placeholder: "거래신고관리번호", hint: "부동산거래계약 신고필증 하단" },
+      { id: "acqTaxPayNo", label: "취득세 납부번호", placeholder: "", hint: "취득세 영수필확인서(위택스 '납부확인서')" },
+      { id: "bondIssueNo", label: "채권발행번호", placeholder: "", hint: "국민주택채권 매입영수증" },
+      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "", hint: "등기신청수수료 전자납부확인서" },
+      { id: "titleInfoSerial", label: "등기필정보 일련번호", placeholder: "", hint: "매도인에게 잔금일에 수령" },
+      { id: "titleInfoPw", label: "등기필정보 비밀번호", placeholder: "", hint: "매도인에게 잔금일에 수령" }
+    ],
     documentCategories: [
       { key: "common", label: "공통 서류" },
       { key: "property", label: "물건(부동산) 관련 서류" },
@@ -1662,6 +1710,59 @@ function wireCalculators(calculators) {
   });
 }
 
+// 등기 과정에서 필요한 각종 번호(부동산 고유번호, 거래관리번호, 채권발행번호 등)를
+// 적어두면 localStorage에 저장돼 다음에 다시 열어도 조회할 수 있는 메모장.
+function renderReferencePanel(type) {
+  const fields = type.referenceFields;
+  if (!fields || !fields.length) return "";
+  return `
+    <div class="ref-panel no-print">
+      <div class="ref-panel-title">📋 번호 메모장</div>
+      <div class="ref-panel-desc">등기 과정에서 필요한 각종 번호를 여기 적어두면 이 브라우저에 저장되어, 나중에 다시 열어도 조회할 수 있습니다.</div>
+      <div class="ref-grid">
+        ${fields.map(f => `
+          <div class="ref-field">
+            <label for="ref-${esc(f.id)}">${esc(f.label)}</label>
+            <div class="ref-input-row">
+              <input id="ref-${esc(f.id)}" type="text" class="ref-input" data-ref="${esc(f.id)}" placeholder="${esc(f.placeholder || "")}" value="${esc(state.numbers[f.id] || "")}">
+              <button type="button" class="ref-copy-btn no-print" data-ref-copy="${esc(f.id)}">복사</button>
+            </div>
+            ${f.hint ? `<div class="ref-field-hint">${esc(f.hint)}</div>` : ""}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function wireReferencePanel() {
+  app.querySelectorAll("[data-ref]").forEach(el => {
+    el.addEventListener("input", () => {
+      state.numbers[el.getAttribute("data-ref")] = el.value;
+      saveState();
+    });
+  });
+  app.querySelectorAll("[data-ref-copy]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-ref-copy");
+      const input = document.getElementById(`ref-${id}`);
+      if (!input || !input.value) return;
+      const done = () => {
+        const original = btn.textContent;
+        btn.textContent = "완료";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = original; btn.classList.remove("copied"); }, 1200);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(done).catch(() => {});
+      } else {
+        input.select();
+        try { document.execCommand("copy"); done(); } catch (e) {}
+      }
+    });
+  });
+}
+
 // 체크박스가 달린 서류 표. rows: [{ id?, group?, label, copies?, note?, usage? }]
 // - group이 있으면 표 왼쪽에 rowspan으로 묶은 "구분" 열을 추가한다 (그룹마다 표를 따로 만들지 않음).
 // - copies/note/usage는 있는 행이 하나라도 있을 때만 해당 열 자체를 만든다.
@@ -1727,7 +1828,7 @@ function renderDocTable(idPrefix, rows) {
   </div>`;
 }
 
-const state = { view: "home", typeId: null, questionIndex: 0, answers: {}, checked: {} };
+const state = { view: "home", typeId: null, questionIndex: 0, answers: {}, checked: {}, numbers: {} };
 const app = document.getElementById("app");
 
 // 답변·체크리스트 상태를 브라우저에 저장해, 다음에 다시 열어도 이어서 볼 수 있게 한다.
@@ -1764,6 +1865,7 @@ function loadState() {
     state.questionIndex = questionIndex;
     state.answers = saved.answers && typeof saved.answers === "object" ? saved.answers : {};
     state.checked = saved.checked && typeof saved.checked === "object" ? saved.checked : {};
+    state.numbers = saved.numbers && typeof saved.numbers === "object" ? saved.numbers : {};
   } catch (e) {
     // 저장된 값이 손상되어 있으면 무시하고 처음 화면으로 시작한다.
   }
@@ -1775,6 +1877,7 @@ function goHome() {
   state.questionIndex = 0;
   state.answers = {};
   state.checked = {};
+  state.numbers = {};
   render();
 }
 
@@ -1783,6 +1886,7 @@ function selectType(typeId) {
   state.typeId = typeId;
   state.answers = {};
   state.checked = {};
+  state.numbers = {};
   state.questionIndex = 0;
   state.view = type.questions.length > 0 ? "question" : "result";
   render();
@@ -2021,6 +2125,8 @@ function renderResult() {
         </h2>
         ${groupsHtml}
 
+        ${renderReferencePanel(type)}
+
         <h2 style="margin-top:32px;">진행 절차</h2>
         <ol class="step-list">${stepsHtml}</ol>
 
@@ -2065,6 +2171,7 @@ function renderResult() {
   app.querySelectorAll("[data-step]").forEach(cb => {
     cb.addEventListener("change", () => toggleStep(cb.getAttribute("data-step")));
   });
+  wireReferencePanel();
 
   if (hasDeepDive) {
     const canHover = window.matchMedia("(hover: hover)").matches;
