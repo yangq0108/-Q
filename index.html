@@ -357,7 +357,27 @@
   .ref-panel-title { font-size: 15px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
   .ref-panel-desc { font-size: 12.5px; color: var(--secondary); margin-bottom: 14px; line-height: 1.5; }
   .ref-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-  @media (min-width: 640px) { .ref-grid { grid-template-columns: 1fr 1fr; } }
+  .ref-tab-btn {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 400;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px 0 0 10px;
+    padding: 16px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    cursor: pointer;
+    box-shadow: -2px 2px 10px rgba(15, 23, 42, 0.18);
+  }
+  .ref-tab-btn:hover { background: #1e40af; }
   .ref-field label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; }
   .ref-field-hint { font-size: 11px; color: #94a3b8; margin-top: 3px; }
   .ref-input-row { display: flex; gap: 6px; }
@@ -732,13 +752,13 @@ const REGISTRATION_TYPES = [
     shortDesc: "집을 사고팔 때, 매수인이 직접 진행하는 소유권 이전 셀프등기",
     who: "매도인과 매수인의 공동신청이 원칙 (실무상 매수인이 서류를 모아 접수)",
     referenceFields: [
-      { id: "propertyId", label: "부동산 고유번호", placeholder: "14자리 숫자", hint: "등기부등본 우측 상단" },
-      { id: "dealMgmtNo", label: "거래관리번호", placeholder: "거래신고관리번호", hint: "부동산거래계약 신고필증 하단" },
-      { id: "acqTaxPayNo", label: "취득세 납부번호", placeholder: "", hint: "취득세 영수필확인서(위택스 '납부확인서')" },
-      { id: "bondIssueNo", label: "채권발행번호", placeholder: "", hint: "국민주택채권 매입영수증" },
-      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "", hint: "등기신청수수료 전자납부확인서" },
-      { id: "titleInfoSerial", label: "등기필정보 일련번호", placeholder: "", hint: "매도인에게 잔금일에 수령" },
-      { id: "titleInfoPw", label: "등기필정보 비밀번호", placeholder: "", hint: "매도인에게 잔금일에 수령" }
+      { id: "propertyId", label: "부동산 고유번호", placeholder: "예: 14자리 숫자", hint: "등기부등본 우측 상단" },
+      { id: "dealMgmtNo", label: "거래관리번호", placeholder: "신고필증에 적힌 거래관리번호 그대로", hint: "부동산거래계약 신고필증 하단" },
+      { id: "acqTaxPayNo", label: "취득세 납부번호", placeholder: "영수필확인서에 적힌 납부번호 그대로", hint: "취득세 영수필확인서(위택스 '납부확인서')" },
+      { id: "bondIssueNo", label: "채권발행번호", placeholder: "예: 14자리 숫자", hint: "국민주택채권 매입영수증" },
+      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "전자납부확인서에 적힌 납부번호 그대로", hint: "등기신청수수료 전자납부확인서" },
+      { id: "titleInfoSerial", label: "등기필정보 일련번호", placeholder: "영문+숫자 조합, 서류에 적힌 그대로", hint: "매도인에게 잔금일에 수령" },
+      { id: "titleInfoPw", label: "등기필정보 비밀번호", placeholder: "서류의 비밀번호표에서 사용한 번호", hint: "매도인에게 잔금일에 수령" }
     ],
     documentCategories: [
       { key: "common", label: "공통 서류" },
@@ -1712,27 +1732,27 @@ function wireCalculators(calculators) {
 
 // 등기 과정에서 필요한 각종 번호(부동산 고유번호, 거래관리번호, 채권발행번호 등)를
 // 적어두면 localStorage에 저장돼 다음에 다시 열어도 조회할 수 있는 메모장.
-function renderReferencePanel(type) {
+function renderReferencePanel(type, opts) {
   const fields = type.referenceFields;
   if (!fields || !fields.length) return "";
-  return `
-    <div class="ref-panel no-print">
-      <div class="ref-panel-title">📋 번호 메모장</div>
-      <div class="ref-panel-desc">등기 과정에서 필요한 각종 번호를 여기 적어두면 이 브라우저에 저장되어, 나중에 다시 열어도 조회할 수 있습니다.</div>
-      <div class="ref-grid">
-        ${fields.map(f => `
-          <div class="ref-field">
-            <label for="ref-${esc(f.id)}">${esc(f.label)}</label>
-            <div class="ref-input-row">
-              <input id="ref-${esc(f.id)}" type="text" class="ref-input" data-ref="${esc(f.id)}" placeholder="${esc(f.placeholder || "")}" value="${esc(state.numbers[f.id] || "")}">
-              <button type="button" class="ref-copy-btn no-print" data-ref-copy="${esc(f.id)}">복사</button>
-            </div>
-            ${f.hint ? `<div class="ref-field-hint">${esc(f.hint)}</div>` : ""}
+  const bare = opts && opts.bare;
+  const inner = `
+    ${bare ? "" : `<div class="ref-panel-title">📋 번호 메모장</div>`}
+    <div class="ref-panel-desc">등기 과정에서 필요한 각종 번호를 여기 적어두면 이 브라우저에 저장되어, 나중에 다시 열어도 조회할 수 있습니다.</div>
+    <div class="ref-grid">
+      ${fields.map(f => `
+        <div class="ref-field">
+          <label for="ref-${esc(f.id)}">${esc(f.label)}</label>
+          <div class="ref-input-row">
+            <input id="ref-${esc(f.id)}" type="text" class="ref-input" data-ref="${esc(f.id)}" placeholder="${esc(f.placeholder || "")}" value="${esc(state.numbers[f.id] || "")}">
+            <button type="button" class="ref-copy-btn no-print" data-ref-copy="${esc(f.id)}">복사</button>
           </div>
-        `).join("")}
-      </div>
+          ${f.hint ? `<div class="ref-field-hint">${esc(f.hint)}</div>` : ""}
+        </div>
+      `).join("")}
     </div>
   `;
+  return bare ? inner : `<div class="ref-panel no-print">${inner}</div>`;
 }
 
 function wireReferencePanel() {
@@ -2097,6 +2117,8 @@ function renderResult() {
   `).join("");
 
   const hasDeepDive = checklist.steps.some(s => s.deepDive);
+  const hasRefPanel = !!(type.referenceFields && type.referenceFields.length);
+  const showSidebar = hasDeepDive || hasRefPanel;
   const m = typeMeta(type.id);
   const mainColumnHtml = `
       <div class="panel">
@@ -2125,8 +2147,6 @@ function renderResult() {
         </h2>
         ${groupsHtml}
 
-        ${renderReferencePanel(type)}
-
         <h2 style="margin-top:32px;">진행 절차</h2>
         <ol class="step-list">${stepsHtml}</ol>
 
@@ -2135,16 +2155,17 @@ function renderResult() {
   `;
 
   app.innerHTML = `
-    <div class="wrap wizard-wrap ${hasDeepDive ? "wrap-wide" : ""}">
+    ${hasRefPanel ? `<button type="button" id="ref-tab-btn" class="ref-tab-btn no-print">📋 번호 메모</button>` : ""}
+    <div class="wrap wizard-wrap ${showSidebar ? "wrap-wide" : ""}">
       <a href="#" class="back-link no-print" id="to-home">← 처음으로</a>
       <div class="result-grid">
         ${mainColumnHtml}
-        ${hasDeepDive ? `
+        ${showSidebar ? `
         <div class="detail-rail no-print" id="detail-rail">
           <div class="detail-card" id="deepdive-panel">
             <div class="detail-placeholder" id="detail-placeholder">
               <div class="icon">🔍</div>
-              <div>절차 항목의<br>'화면 흐름 · 자세히 보기'에<br>마우스를 올리거나 클릭하면<br>여기에 자세히 표시돼요.</div>
+              <div>절차 항목의<br>'화면 흐름 · 자세히 보기'에<br>마우스를 올리거나 클릭하면,<br>또는 오른쪽 '번호 메모' 탭을 누르면<br>여기에 표시돼요.</div>
             </div>
             <div class="deepdive-head" id="deepdive-head" hidden>
                 <div class="deepdive-title" id="deepdive-title"></div>
@@ -2171,7 +2192,10 @@ function renderResult() {
   app.querySelectorAll("[data-step]").forEach(cb => {
     cb.addEventListener("change", () => toggleStep(cb.getAttribute("data-step")));
   });
-  wireReferencePanel();
+
+  if (hasRefPanel) {
+    document.getElementById("ref-tab-btn").addEventListener("click", () => openMemoPanel(type));
+  }
 
   if (hasDeepDive) {
     const canHover = window.matchMedia("(hover: hover)").matches;
@@ -2180,6 +2204,8 @@ function renderResult() {
       btn.addEventListener("click", () => openDeepDive(checklist, stepId));
       if (canHover) btn.addEventListener("mouseenter", () => openDeepDive(checklist, stepId));
     });
+  }
+  if (showSidebar) {
     document.getElementById("deepdive-close").addEventListener("click", resetDeepDive);
     document.getElementById("detail-rail").addEventListener("click", (e) => {
       if (e.target.id === "detail-rail") resetDeepDive();
@@ -2207,8 +2233,7 @@ function openDeepDive(checklist, stepId) {
   const listHtml = dd.list ? `<ol>${dd.list.map((li, i) => `<li>${(pairedMockups && pairedMockups[i]) || ""}${linkify(li)}</li>`).join("")}</ol>` : "";
   const tablesHtml = dd.tables ? dd.tables.map(renderRateTable).join("") : "";
   const calculatorsHtml = dd.calculators ? dd.calculators.map(renderCalculator).join("") : "";
-  document.getElementById("deepdive-title").textContent = step.title;
-  document.getElementById("deepdive-body").innerHTML = `
+  const bodyHtml = `
     ${topMockup || ""}
     ${calculatorsHtml}
     ${tablesHtml}
@@ -2216,7 +2241,14 @@ function openDeepDive(checklist, stepId) {
     ${listHtml}
     ${dd.links && dd.links.length ? `<div class="deepdive-links">${dd.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>` : ""}
   `;
+  showDeepDivePanel(step.title, bodyHtml);
   wireCalculators(dd.calculators);
+}
+
+// 오른쪽 자세히 보기 패널을 열어서 제목·본문을 채운다 (openDeepDive와 openMemoPanel이 공용으로 쓴다).
+function showDeepDivePanel(title, bodyHtml) {
+  document.getElementById("deepdive-title").textContent = title;
+  document.getElementById("deepdive-body").innerHTML = bodyHtml;
   document.getElementById("detail-placeholder").hidden = true;
   document.getElementById("deepdive-head").hidden = false;
   document.getElementById("deepdive-body").hidden = false;
@@ -2225,6 +2257,13 @@ function openDeepDive(checklist, stepId) {
   if (window.matchMedia("(max-width: 1099.98px)").matches) {
     document.body.style.overflow = "hidden";
   }
+}
+
+// 오른쪽 탭을 눌렀을 때 번호 메모장을 같은 자세히 보기 패널에 띄운다.
+function openMemoPanel(type) {
+  const bodyHtml = renderReferencePanel(type, { bare: true });
+  showDeepDivePanel("📋 번호 메모장", bodyHtml);
+  wireReferencePanel();
 }
 
 function resetDeepDive() {
