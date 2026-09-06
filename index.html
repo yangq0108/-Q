@@ -752,13 +752,13 @@ const REGISTRATION_TYPES = [
     shortDesc: "집을 사고팔 때, 매수인이 직접 진행하는 소유권 이전 셀프등기",
     who: "매도인과 매수인의 공동신청이 원칙 (실무상 매수인이 서류를 모아 접수)",
     referenceFields: [
-      { id: "propertyId", label: "부동산 고유번호", placeholder: "예: 14자리 숫자", hint: "등기부등본 우측 상단" },
-      { id: "dealMgmtNo", label: "거래관리번호", placeholder: "신고필증에 적힌 거래관리번호 그대로", hint: "부동산거래계약 신고필증 하단" },
-      { id: "acqTaxPayNo", label: "취득세 납부번호", placeholder: "영수필확인서에 적힌 납부번호 그대로", hint: "취득세 영수필확인서(위택스 '납부확인서')" },
-      { id: "bondIssueNo", label: "채권발행번호", placeholder: "예: 14자리 숫자", hint: "국민주택채권 매입영수증" },
-      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "전자납부확인서에 적힌 납부번호 그대로", hint: "등기신청수수료 전자납부확인서" },
-      { id: "titleInfoSerial", label: "등기필정보 일련번호", placeholder: "영문+숫자 조합, 서류에 적힌 그대로", hint: "매도인에게 잔금일에 수령" },
-      { id: "titleInfoPw", label: "등기필정보 비밀번호", placeholder: "서류의 비밀번호표에서 사용한 번호", hint: "매도인에게 잔금일에 수령" }
+      { id: "propertyId", label: "부동산 고유번호", placeholder: "예: 1146-2019-000123", hint: "등기부등본 우측 상단 (14자리, 지역-연도-일련번호 형태)" },
+      { id: "dealMgmtNo", label: "거래관리번호", placeholder: "예: 41113-2026-4-0003043", hint: "부동산거래계약 신고필증 하단 (지역코드-연도-구분-일련번호)" },
+      { id: "acqTaxPayNo", label: "취득세 납부번호", placeholder: "예: 12345678901234567890", hint: "취득세 영수필확인서(위택스 '납부확인서'). 자릿수는 사이트마다 다를 수 있어 실제 서류 기준으로 입력" },
+      { id: "bondIssueNo", label: "채권발행번호", placeholder: "예: 20260912345678", hint: "국민주택채권 매입영수증 (14자리)" },
+      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "예: 1234567890123456", hint: "등기신청수수료 전자납부확인서. 정확한 자릿수는 실제 확인서 기준으로 입력" },
+      { id: "titleInfoSerial", label: "등기필정보 일련번호", placeholder: "예: AB12-CD34-EF56", hint: "매도인에게 잔금일에 수령 (영문·숫자 4자리씩 3묶음)" },
+      { id: "titleInfoPw", label: "등기필정보 비밀번호", placeholder: "예: 1234", hint: "매도인에게 잔금일에 수령 (서류의 비밀번호표 50개 중 순서대로 하나씩 사용)" }
     ],
     documentCategories: [
       { key: "common", label: "공통 서류" },
