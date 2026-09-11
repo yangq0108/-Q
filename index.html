@@ -307,8 +307,8 @@
 
   /* 필요 서류·잔금 지급·등기소 접수처럼 "서류 + 부수 + 비고/활용"을 한눈에 봐야 하는 목록은
      체크박스 달린 표로 보여준다. <colgroup>이 열 너비를 고정해 표마다 폭이 들쭉날쭉해지지 않는다. */
-  .step-doc-table-wrap { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
-  table.step-doc-table { table-layout: fixed; width: 100%; border-collapse: collapse; font-size: 13px; }
+  .step-doc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e8f0; border-radius: 10px; background: #fff; }
+  table.step-doc-table { table-layout: fixed; width: 100%; min-width: 480px; border-collapse: collapse; font-size: 13px; }
   table.step-doc-table th {
     background: #f8fafc;
     color: #64748b;
@@ -376,6 +376,26 @@
     text-orientation: mixed;
     cursor: pointer;
     box-shadow: -2px 2px 10px rgba(15, 23, 42, 0.18);
+  }
+  /* 좁은 화면에서는 세로 탭이 본문 오른쪽 끝 글자를 가리므로, 오른쪽 아래에 작은 원형 버튼으로 바꾼다 */
+  @media (max-width: 640px) {
+    .ref-tab-btn {
+      top: auto;
+      right: 16px;
+      bottom: 20px;
+      transform: none;
+      writing-mode: horizontal-tb;
+      border-radius: 999px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.2;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
   }
   .ref-tab-btn:hover { background: #1e40af; }
   .ref-field label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px; }
@@ -521,7 +541,7 @@
   table.dd-table tbody tr:hover td { background: #f8fafc; }
   .dd-table-note { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.5; }
   /* 요율표(숫자, 오른쪽 정렬)와 달리 절차 설명 표는 줄바꿈되는 왼쪽 정렬 텍스트로 보여준다 */
-  table.dd-table.dd-table--wrap { table-layout: fixed; white-space: normal; }
+  table.dd-table.dd-table--wrap { table-layout: fixed; min-width: 420px; white-space: normal; }
   table.dd-table.dd-table--wrap th { text-align: center; }
   table.dd-table.dd-table--wrap td { text-align: left; overflow-wrap: break-word; }
   table.dd-table.dd-table--wrap td:first-child { text-align: center; font-weight: 700; color: var(--primary, #1d4ed8); }
