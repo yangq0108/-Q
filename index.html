@@ -345,6 +345,25 @@
   ul.doc-usage-list-compact li { margin-bottom: 3px; line-height: 1.5; }
   ul.doc-usage-list-compact li:last-child { margin-bottom: 0; }
 
+  /* 좁은 화면에서는 글자를 전체적으로 살짝 줄여서 한 화면에 더 넓은 범위가 보이게 한다 */
+  @media (max-width: 640px) {
+    .wrap { padding: 32px 16px; }
+    h1 { font-size: 27px; }
+    .lead { font-size: 15px; margin-bottom: 24px; }
+    h2 { font-size: 16px; }
+    .q-title { font-size: 17px; }
+    .q-help { font-size: 13px; }
+    .result-title { font-size: 17px; }
+    .who-line { font-size: 13px; }
+    .card .desc { font-size: 12.5px; }
+    .step-title { font-size: 14.5px; }
+    .step-desc { font-size: 13px; }
+    .step-details { font-size: 12.5px; padding: 8px 12px 8px 22px; }
+    .doc-note { font-size: 12.5px; }
+    table.step-doc-table { font-size: 12px; }
+    .warning-box { font-size: 13px; }
+  }
+
   /* 좁은 화면에서는 가로 스크롤 표 대신, 문서 하나당 카드 하나로 쌓아서 보여준다 */
   @media (max-width: 640px) {
     .step-doc-table-wrap { overflow-x: visible; border: none; background: none; }
