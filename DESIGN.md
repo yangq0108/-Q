@@ -20,6 +20,8 @@ colors:
   type-sale-container: "#EFF6FF"
   type-mortgage: "#16A34A"
   type-mortgage-container: "#F0FDF4"
+  type-loan: "#0E7490"
+  type-loan-container: "#ECFEFF"
   type-jeonse: "#7C3AED"
   type-jeonse-container: "#F5F3FF"
   type-gift: "#DB2777"
@@ -107,7 +109,7 @@ components:
 - **Amber (#B45309) / Amber Container (#FFFBEB):** 경고·주의 배너 전용. 다른
   용도로 쓰지 않는다.
 - **Success (#15803D):** "난이도 낮음" 같은 긍정적 배지에만 쓴다.
-- **Type 색상 5종 (sale/mortgage/jeonse/gift/inheritance):** 등기 유형 선택
+- **Type 색상 6종 (sale/loan/mortgage/jeonse/gift/inheritance):** 등기 유형 선택
   카드의 아이콘 배지, 결과 화면 헤더 배지에 유형별로 고정 배정한다. 절대 서로
   바꿔 쓰지 않는다 — 사용자가 색으로 유형을 다시 찾아올 수 있어야 한다.
 

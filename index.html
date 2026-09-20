@@ -22,6 +22,7 @@
     --success-container: #F0FDF4;
     --type-sale: #2563EB;         --type-sale-c: #EFF6FF;
     --type-mortgage: #16A34A;     --type-mortgage-c: #F0FDF4;
+    --type-loan: #0E7490;         --type-loan-c: #ECFEFF;
     --type-jeonse: #7C3AED;       --type-jeonse-c: #F5F3FF;
     --type-gift: #DB2777;         --type-gift-c: #FDF2F8;
     --type-inheritance: #475569;  --type-inheritance-c: #F1F5F9;
@@ -669,6 +670,8 @@
   }
   .dd-calc-result b { display: block; font-size: 18px; color: #0f172a; margin-bottom: 2px; }
   .dd-calc-sub { display: block; font-size: 12px; color: #64748b; }
+  .dd-calc-lines { margin: 8px 0; padding-left: 16px; font-size: 12px; color: #334155; line-height: 1.55; }
+  .dd-calc-lines li { margin-bottom: 3px; }
 
   /* 1100px 미만(모바일 포함)에서는 오른쪽 고정 사이드바 대신, 눌렀을 때만 뜨는 바텀시트 모달로 보여준다.
      그냥 본문 아래에 이어붙이면 페이지 맨 밑까지 스크롤해야 보여서 모바일에서 "먹통"처럼 느껴지기 때문. */
@@ -1177,7 +1180,8 @@ const REGISTRATION_TYPES = [
           yes: {
             warnings: [
               "대부분의 은행은 대출 실행과 동시에 근저당권을 설정해야 하므로, 은행이 지정한 법무사를 통한 동시 진행을 대출 조건으로 요구하는 경우가 많습니다. 완전한 셀프등기가 어려울 수 있으니 대출 실행 전 은행(또는 대출상담사)에 셀프등기 가능 여부를 반드시 문의하세요.",
-              "은행이 허용하는 경우, 소유권이전등기는 셀프로 진행하고 근저당권설정등기만 은행 지정 법무사가 동시 접수하는 절충 방식이 가능한 경우도 있습니다."
+              "은행이 허용하는 경우, 소유권이전등기는 셀프로 진행하고 근저당권설정등기만 은행 지정 법무사가 동시 접수하는 절충 방식이 가능한 경우도 있습니다.",
+              "근저당권설정등기를 직접 진행하려면 처음 화면의 '근저당권설정등기 (대출)' 유형에서 서류·세금·절차를 따로 안내받을 수 있습니다."
             ],
             documents: [
               { id: "loan-agreement", label: "대출약정서", category: "loan" },
@@ -1223,6 +1227,250 @@ const REGISTRATION_TYPES = [
             documents: [
               { id: "share-agreement", label: "공유지분 비율 합의서(지분율 명시)", category: "buyer" },
               { id: "co-buyer-docs", label: "공동매수인 전원의 신분증·도장·주민등록등본", category: "buyer" }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    id: "mortgage-set",
+    title: "근저당권설정등기 (대출)",
+    shortDesc: "은행 대출을 받으며 내 부동산에 근저당권을 설정하는 등기 — 셀프도 가능하지만 은행이 지정법무사를 요구하는 경우가 많아 사전 확인이 필수",
+    who: "등기권리자(근저당권자=은행 등)와 등기의무자(근저당권설정자=소유자)의 공동신청이 원칙 — 셀프로는 소유자가 은행이 준 위임장·계약서·법인서류를 들고 직접 접수하는 형태가 일반적",
+    referenceFields: [
+      { id: "propertyId", label: "부동산 고유번호", placeholder: "예: 1234-5678-901234", hint: "등기부등본 우측 상단 (14자리)" },
+      { id: "ceiling", label: "채권최고액", placeholder: "예: 120,000,000", hint: "근저당권설정계약서 (대출금의 통상 110~130%)" },
+      { id: "licenseTaxPayNo", label: "등록면허세 납부번호", placeholder: "영수필확인서에 적힌 납부번호 그대로", hint: "등록면허세 영수필확인서(위택스 '납부확인서')" },
+      { id: "bondIssueNo", label: "채권발행번호", placeholder: "예: 12345678901234", hint: "국민주택채권 매입영수증 (14자리, 매입 대상인 경우)" },
+      { id: "regFeePayNo", label: "등기신청수수료 납부번호", placeholder: "전자납부확인서에 적힌 납부번호 그대로", hint: "등기신청수수료 전자납부확인서" }
+    ],
+    documentCategories: [
+      { key: "creditor", label: "근저당권자(은행 등) 관련 서류" },
+      { key: "owner", label: "소유자(설정자) 관련 서류" },
+      { key: "tax", label: "세금·비용 관련 서류" },
+      { key: "form", label: "등기신청서" }
+    ],
+    baseDocuments: [
+      { id: "mortgage-contract", label: "근저당권설정계약서", category: "creditor", note: "은행이 양식을 제공하는 등기원인 증명 서류. 채권최고액(대출금의 통상 110~130%)·채무자·이자와 존속기간·부동산 표시를 서명 전에 확인한다. 이 계약서 자체에는 인지세가 붙지 않는다(인지세는 대출약정서 기준으로 은행·고객이 반반 부담)." },
+      { id: "owner-registry-title", label: "등기필증(권리증)", category: "owner", note: "소유자 본인의 기존 소유권 등기필증 — 근저당 설정에서도 소유자가 등기의무자라 필요하다. 분실해도 재발급되지 않아 없으면 별도 확인 절차가 필요하다." },
+      { id: "owner-seal-cert", label: "인감증명서", category: "owner", note: "발급일로부터 3개월 이내. 소유권이전용(부동산 매도용)이 아니라 일반용으로 발급하는 것이 통상적이나 용도 표기는 은행 안내를 따른다. 인감증명서 대신 본인서명사실확인서와 자필 서명으로 처리하는 경우도 있으니 은행에 확인" },
+      { id: "owner-abstract", label: "주민등록초본", category: "owner", note: "발급일로부터 3개월 이내, 주소 변동 이력 포함·주민등록번호 전체 표시로 발급" },
+      { id: "owner-id-stamp", label: "신분증, 인감도장", category: "owner", note: "인감증명서와 같은 인감도장으로 계약서·신청서에 날인" },
+      { id: "set-license-tax", label: "등록면허세 영수필확인서", category: "tax", note: "채권최고액 × 0.2%(최저 6,000원) + 지방교육세(등록면허세의 20%). 위택스에서 신고·납부한 뒤 '납부확인서' 메뉴에서 출력 (등기 첨부서류로는 관행상 '영수필확인서'라 부름). 세액은 '등록면허세 신고·납부' 단계의 계산기로 미리 확인할 수 있다." },
+      { id: "set-bond", label: "국민주택채권 매입영수증", category: "tax", note: "저당권 설정금액 2천만원 이상이면 설정금액의 1%(상한 10억원)를 매입하며 매입 의무자는 소유자(설정자). 대부분 즉시매도해 할인 손실(고객부담금)만 낸다. 주택연금·일부 정책대출 등은 면제 사유가 있으니 매입 대상인지 은행에 확인" },
+      { id: "set-reg-fee", label: "등기신청수수료 전자납부확인서", category: "tax", note: "인터넷등기소(iros.go.kr)에서 전자납부. e-Form 기준 부동산 1개당 15,000원(2025.8.1. 인상), 확인서는 납부일로부터 14일간만 유효" },
+      { id: "set-form", label: "근저당권설정등기신청서", category: "form", note: "대법원 인터넷등기소(iros.go.kr) 'e-Form' 작성 프로그램으로 작성·출력. 전자신청이 아니라 출력·날인 후 등기소에 방문 제출" }
+    ],
+    baseSteps: [
+      { id: "ms1", title: "은행 사전 확인", description: "대출 약정 전에 셀프 설정이 가능한지, 서류·비용은 어떻게 처리하는지 은행에 먼저 확인한다.", details: [
+        "근저당권 설정은 소유자가 직접 신청해도 법적으로는 가능하지만, 은행이 지정 법무사를 통한 설정을 대출 조건으로 요구하는 경우가 많다 — 대출 상담 단계에서 '셀프 설정이 가능한지'부터 물어본다.",
+        "확인할 것: ① 셀프 설정 허용 여부 ② 근저당권설정계약서·위임장·법인등기사항증명서를 은행이 어떻게 제공하는지 ③ 세금·수수료를 은행이 부담하는 상품일 때 셀프면 어떻게 정산하는지 ④ 등기 접수일과 대출 실행일의 순서",
+        "여신거래 표준약관상 등록면허세·지방교육세·등기신청수수료·법무사 보수는 통상 은행이 부담하고, 국민주택채권 매입비는 채무자가 부담하며, 대출약정서의 인지세는 은행과 고객이 반반 부담하는 것으로 안내돼 왔다 — 상품과 시기에 따라 다를 수 있으니, 셀프로 진행할 때 비용 정산 방식은 반드시 은행에 확인한다."
+      ], checklist: [
+        "은행에 셀프 근저당 설정 가능 여부 확인",
+        "은행이 제공하는 서류(설정계약서·위임장·법인등기사항증명서) 범위와 수령 방법 확인",
+        "세금·수수료 부담 주체와 정산 방식 확인",
+        "등기 접수일과 대출 실행일 일정 확정"
+      ]},
+      { id: "ms2", title: "설정계약 체결 및 서류 준비", description: "은행 양식의 근저당권설정계약서에 서명·날인하고, 소유자 서류를 발급받는다.", details: [
+        "근저당권설정계약서에 채권최고액, 채무자, 근저당권설정자(소유자), 이자·손해금 특약, 존속기간, 부동산 표시가 맞게 적혔는지 확인하고 소유자가 인감도장으로 서명·날인한다.",
+        "은행이 발급하는 위임장과 법인등기사항증명서(은행 등 법인인 경우)를 계약서와 함께 받아둔다 — 법인등기사항증명서는 발급일로부터 3개월 이내여야 하니 접수 일정에 맞춰 받는다.",
+        "소유자는 인감증명서(3개월 이내)와 주민등록초본(주소 변동 이력 포함, 3개월 이내)을 발급받는다. 인감증명서 용도는 은행 안내를 따르고, 본인서명사실확인서로 대체 가능한지도 함께 확인한다.",
+        "소유자 본인의 기존 소유권 등기필증(권리증)을 찾아둔다. 분실해도 재발급되지 않으므로 없다면 등기소에서 별도 확인 절차가 필요하다.",
+        "등기부등본을 발급받아 부동산 고유번호(우측 상단 14자리)를 확인해두고, 이때 소유자 주소가 현재 주민등록 주소와 같은지도 함께 본다."
+      ], checklist: [
+        "근저당권설정계약서 서명·날인 완료",
+        "은행 위임장·법인등기사항증명서 수령",
+        "인감증명서·주민등록초본 발급 (3개월 이내)",
+        "기존 소유권 등기필증(권리증) 확보",
+        "부동산 고유번호 확인 (등기부등본 우측 상단 14자리)"
+      ]},
+      { id: "ms3", title: "등록면허세 신고·납부", description: "위택스에서 채권최고액을 과세표준으로 등록면허세를 신고·납부한다.", details: [
+        "등록면허세 = 채권최고액 × 0.2%(최저 6,000원), 지방교육세 = 등록면허세 × 20%. 예: 채권최고액 1억 2천만원이면 등록면허세 240,000원 + 지방교육세 48,000원 = 288,000원 — '자세히 보기'의 계산기에 내 채권최고액을 넣으면 세금·채권·수수료를 한 번에 볼 수 있다.",
+        "위택스(wetax.go.kr, 서울은 이택스)에서 등록면허세(저당권 설정)를 신고하며 부동산 소재지 관할 지자체를 선택하고 채권최고액을 과세표준으로 입력한다. 세액은 위택스 계산 화면 기준으로 최종 확인한다.",
+        "은행이 세금을 부담하는 상품이면 소유자가 먼저 납부하고 환급받는지 등 처리 방식을 은행과 미리 정한다."
+      ], checklist: [
+        { label: "등록면허세 영수필확인서(위택스 '납부확인서') 확보", usage: [
+          "e-Form 4단계 '수수료등 입력'에 세액·납부번호 입력",
+          "등기소 접수(ms7) 때 원본 제출"
+        ] }
+      ], deepDive: {
+        calculators: [{ id: "mortgage-set-calc", kind: "mortgage-set" }],
+        list: [
+          "① 위택스 로그인 → 신고하기 → 등록면허세 → 저당권 설정등기 항목 선택",
+          "② 부동산 소재지 관할 지자체 선택 후 채권최고액을 과세표준으로 입력",
+          "③ 산출된 등록면허세·지방교육세를 확인해 납부",
+          "④ 납부 후 '납부확인서' 메뉴에서 영수필확인서 출력 (납부번호 메모)"
+        ],
+        links: [{ label: "위택스", url: "https://www.wetax.go.kr" }]
+      }},
+      { id: "ms4", title: "국민주택채권 매입", description: "설정금액이 2천만원 이상이면 설정금액의 1%를 국민주택채권으로 매입하고 즉시 매도한다.", details: [
+        "저당권 설정금액(채권최고액)이 2천만원 이상이면 설정금액의 1%를 매입해야 하고 매입금액 상한은 10억원이다. 시가표준액 기준의 매매·상속과 달리 지역 구분이 없으며, 매입 의무자는 저당권설정자인 소유자다.",
+        "대부분 매입과 동시에 즉시 매도해 할인 손실(고객부담금 = 매입금액 × 당일 채권 할인율)만 부담한다. 예: 채권최고액 1억 2천만원이면 매입금액 120만원이고, 할인율이 5%라면 약 6만원(5%는 임의 가정이며 할인율은 매일 바뀐다).",
+        "주택담보노후연금보증·장기주택저당대출(연금방식), 농어민 영농자금 대출 등은 법령상 매입이 면제된다 — 일반 주택담보대출이 면제 대상인지는 상품마다 다르니 은행에 확인한다.",
+        "주택도시기금(nhuf.molit.go.kr) '셀프 채권매입 도우미' 등에서 매입하며, 매입용도·대상은 저당권 설정 관련 항목을 선택하고 채권최고액을 입력한다(화면 명칭은 바뀔 수 있음)."
+      ], checklist: [
+        { label: "국민주택채권 매입영수증(채권발행번호 포함) 확보 — 매입 대상인 경우", usage: [
+          "e-Form 4단계 '국민주택채권매입액 입력'에 발행번호 입력",
+          "등기소 접수(ms7) 때 원본 제출"
+        ] }
+      ], deepDive: {
+        calculators: [{ id: "mortgage-set-calc-bond", kind: "mortgage-set" }],
+        links: [{ label: "주택도시기금(국민주택채권)", url: "https://nhuf.molit.go.kr" }]
+      }},
+      { id: "ms5", title: "등기신청수수료 납부", description: "인터넷등기소에서 등기신청수수료를 전자납부하고 전자납부확인서를 출력한다.", details: [
+        "등록면허세와 달리 등기신청수수료는 위택스가 아니라 대법원 인터넷등기소(iros.go.kr)에서 납부한다.",
+        "e-Form(전자표준양식) 기준 부동산 1개당 15,000원이다(2025년 8월 1일 인상). 아파트 등 구분건물은 1개지만 토지·건물이 따로 등기돼 있으면 2개로 계산될 수 있으니 결제 화면에서 금액을 확인한다.",
+        "결제 후 출력되는 전자납부확인서의 납부번호를 확인해둔다 — e-Form 4단계에 입력한다. 확인서는 납부일로부터 14일간만 유효하므로 접수 일정에 맞춰 납부한다."
+      ], checklist: [
+        { label: "등기신청수수료 전자납부확인서 확보", usage: [
+          "납부번호 → e-Form 4단계 '수수료등 입력'의 등기신청수수료 납부정보란에 입력",
+          "확인서 원본 → 등기소 접수(ms7) 때 제출"
+        ] }
+      ]},
+      { id: "ms6", title: "등기신청서(e-Form) 작성", description: "인터넷등기소에서 근저당권설정등기 신청서를 e-Form으로 작성한다. (세금·채권·수수료 납부를 마친 뒤 진행)", details: [
+        "인터넷등기소(iros.go.kr) 로그인 → '부동산등기' → '통합전자등기' → '신규작성'에서 e-Form 작성을 시작한다. 등기유형은 '설정' 계열에서 '근저당권설정'을 선택한다.",
+        "소유권이전과 달리 등기필정보는 소유자 본인의 기존 등기필정보라 작성 중에 바로 입력할 수 있고, 새로 생기는 근저당권의 등기필정보는 근저당권자(은행)에게 통지된다(3단계의 '등기필정보 수령자'를 확인).",
+        "아래 단계별 안내는 소유권이전 e-Form의 5단계 구성을 기준으로 정리한 것이라, 근저당 신청서의 실제 화면·항목명은 조금 다를 수 있다."
+      ], checklist: [
+        "근저당권설정계약서 (채권최고액·채무자·이자·존속기간 확인)",
+        "등록면허세 영수필확인서 준비",
+        "국민주택채권 매입영수증 준비 (매입 대상인 경우)",
+        "등기신청수수료 전자납부확인서 준비",
+        "소유자 기존 등기필정보(일련번호·비밀번호) 확인",
+        "부동산 고유번호 확인 (등기부등본 우측 상단 14자리)"
+      ], deepDive: {
+        tables: [
+          { wrap: true, title: "e-Form 작성 단계별 화면 (소유권이전 e-Form 기준 유추)", headers: ["단계", "화면", "할 일"], colWidths: ["40px", "104px", ""], rows: [
+            ["1", "제출방식 및 이용동의", "제출방식은 기본값인 '이폼(e-Form)'을 유지하고 이용동의에 체크한다. 작성한 신청서는 출력해서 관할 등기소에 직접 제출해야 한다."],
+            ["2", "등기유형/원인/부동산표시", "'설정' 계열에서 '근저당권설정'을 선택한다. 부동산 고유번호(14자리)로 부동산을 입력하고, 등기원인은 '설정계약', 연월일은 근저당권설정계약서의 계약일로 넣는다."],
+            ["3", "등기할 사항", "채권최고액, 채무자, 이자·손해금 등 특약, 존속기간을 계약서 그대로 입력한다. 등기의무자는 소유자(설정자)로 선택하고 소유자의 기존 등기필정보(일련번호·비밀번호)를 입력한다. 등기권리자는 근저당권자(은행)의 상호·본점 소재지·법인등록번호를 법인등기사항증명서 기준으로 입력하고, 등기필정보 수령자를 확인한다."],
+            ["4", "수수료등 입력", "등록면허세 납부정보(세액·납부번호), 국민주택채권매입액(설정금액·채권발행번호, 매입 대상인 경우), 등기신청수수료 납부번호를 각 영수필확인서·영수증에 적힌 대로 입력한다."],
+            ["5", "첨부서면 및 연계정보", "근저당권설정계약서, 인감증명서, 등기필증(권리증), 주민등록초본, 근저당권자 위임장, 법인등기사항증명서, 등록면허세 영수필확인서, 국민주택채권 매입영수증, 등기신청수수료 전자납부확인서 등 실제 제출할 서류를 각 1통씩 체크한 뒤 '작성완료 및 확인'을 누른다."]
+          ] }
+        ],
+        list: [
+          "마지막으로 전체 내용을 다시 확인하고 '신청서 출력'을 눌러 인쇄한다. 소유자의 등기필정보를 이미 입력했으므로 소유권이전과 달리 재출력할 필요가 없다."
+        ],
+        links: [{ label: "대법원 인터넷등기소", url: "http://www.iros.go.kr" }]
+      }},
+      { id: "ms7", title: "등기소 접수", description: "출력한 신청서에 날인하고 소유자·은행 서류와 함께 관할 등기소에 방문 제출한다.", details: [
+        "부동산 소재지 관할 등기소는 인터넷등기소의 '관할등기소 찾기' 메뉴로 확인한다.",
+        "접수 날짜는 은행과 정한 대출 실행 일정에 맞춘다 — 등기 접수와 대출 실행의 선후는 은행 안내를 따른다.",
+        "신청서가 2장 이상이면 모든 페이지에 간인한다. 간인(間印)이란 여러 장으로 된 문서 중간에 페이지가 바뀌치기되지 않았음을 증명하기 위해 맞닿는 두 페이지에 걸쳐 도장을 찍는 것으로, 신청서는 신청인 또는 그 대리인이 하면 되고(부동산등기규칙 제56조 제2항) 등기권리자나 등기의무자가 여러 명이면 그 중 1명이 하면 된다.",
+        "소유자가 직접 접수하고 근저당권자(은행)는 은행이 발급한 위임장으로 대리한다. 소유자·은행 서류는 모두 원본으로 제출한다.",
+        "등기소 사전검토 창구에서 서류를 검사받아 미비점을 보완한 뒤 최종 제출한다.",
+        "e-Form은 전자신청이 아니다. 방문 없이 온라인으로 접수하는 '전자신청'은 사용자등록이 선행돼야 해 셀프에서는 잘 쓰이지 않는다."
+      ], checklistTable: [
+        { group: "소유자(설정자) 서류", label: "등기필증(권리증)", copies: "1부", note: "소유자 본인의 기존 소유권 등기필증" },
+        { group: "소유자(설정자) 서류", label: "인감증명서", copies: "1부", note: "발급 3개월 이내, 계약서·신청서에 찍은 인감도장과 일치해야 함" },
+        { group: "소유자(설정자) 서류", label: "주민등록초본", copies: "1부", note: "발급 3개월 이내" },
+        { group: "근저당권자 서류", label: "근저당권설정계약서", copies: "1부(원본)", note: "서명·날인 완료" },
+        { group: "근저당권자 서류", label: "근저당권자 위임장", copies: "1부(원본)", note: "은행이 발급, 은행 인감(사용인감) 날인" },
+        { group: "근저당권자 서류", label: "법인등기사항증명서", copies: "1부", note: "은행 등 법인인 경우, 발급 3개월 이내" },
+        { group: "세금·비용 서류", label: "등록면허세 영수필확인서", copies: "1부(원본)", note: "위택스 화면명 '납부확인서'" },
+        { group: "세금·비용 서류", label: "국민주택채권 매입영수증", copies: "1부(원본)", note: "매입 대상인 경우 — 채권발행번호 확인" },
+        { group: "세금·비용 서류", label: "등기신청수수료 전자납부확인서", copies: "1부(원본)", note: "납부번호 확인" },
+        { group: "신청서류", label: "근저당권설정등기신청서", copies: "1부(원본)", note: "2장 이상이면 간인 완료" }
+      ], checklist: [
+        "소유자 신분증·인감도장 지참"
+      ]},
+      { id: "ms8", title: "등기완료 확인", description: "등기사항증명서에서 근저당권 설정 내용을 확인한다.", details: [
+        "인터넷등기소에서 등기사항증명서(을구)를 열람·발급해 근저당권설정 내용을 확인한다 — 채권최고액, 채무자, 근저당권자가 계약서와 같은지 살펴본다.",
+        "새 근저당권의 등기필정보는 근저당권자(은행)에게 통지되므로 소유자가 따로 받을 서류는 없다.",
+        "은행이 등기 접수증이나 등기사항증명서로 설정을 확인한 뒤 대출을 실행하는 순서인 경우가 많다(상품별로 다름)."
+      ]}
+    ],
+    baseWarnings: [
+      "근저당권 설정은 법적으로 소유자가 직접 신청할 수 있지만, 은행이 지정 법무사를 통한 설정을 대출 조건으로 요구하는 경우가 많아 실제 장벽은 은행 정책입니다. 대출 상담 단계에서 셀프 설정 가능 여부를 먼저 확인하세요.",
+      "세금·수수료를 누가 부담하는지 확인하세요. 여신거래 표준약관상 등록면허세·지방교육세·등기신청수수료·법무사 보수는 통상 은행이 부담하고 채권 매입비는 채무자가 부담하는 것으로 안내돼 왔지만, 셀프로 진행할 때의 정산 방식은 은행마다 다를 수 있습니다.",
+      "소유자의 기존 소유권 등기필증(권리증)이 필요합니다. 분실해도 재발급되지 않으므로 미리 찾아두세요. 새 근저당권의 등기필정보는 은행에게 통지됩니다.",
+      "인감증명서·주민등록초본·법인등기사항증명서는 등기 신청일 기준 발급일로부터 3개월 이내여야 합니다.",
+      "e-Form은 전자신청이 아니라 출력·날인 후 등기소에 방문 제출하는 방식입니다. 이 유형의 e-Form 단계 설명은 소유권이전 e-Form 구성을 기준으로 정리한 것이라 실제 화면과 다를 수 있으니 작성 중 화면 안내를 함께 확인하세요.",
+      "세율·수수료·면제 기준은 법령 개정으로 바뀔 수 있습니다 — 위택스, 인터넷등기소 결제 화면, 주택도시기금에서 최신 금액을 다시 확인하세요."
+    ],
+    questions: [
+      {
+        id: "creditor-type",
+        text: "근저당권자(돈을 빌려주는 쪽)는 누구인가요?",
+        options: [
+          { value: "bank", label: "은행 등 금융기관(법인)" },
+          { value: "individual", label: "개인(사인 간 대여)" }
+        ],
+        effects: {
+          bank: {
+            documents: [
+              { id: "bank-poa-set", label: "근저당권자(은행) 위임장", category: "creditor", note: "소유자가 근저당권자를 대리해 단독 접수할 때 필요 — 은행 인감(사용인감) 날인. 은행이 발급해주는지 사전 확인" },
+              { id: "bank-corp-cert", label: "은행 법인등기사항증명서", category: "creditor", note: "발급일로부터 3개월 이내, 은행이 제공" }
+            ]
+          },
+          individual: {
+            documents: [
+              { id: "creditor-abstract", label: "근저당권자 주민등록등본(또는 초본)", category: "creditor", note: "등기권리자의 주소·주민등록번호를 증명하는 서류, 발급 3개월 이내" },
+              { id: "creditor-id", label: "근저당권자 신분증", category: "creditor", note: "사본" }
+            ],
+            warnings: [
+              "근저당권자가 개인이면 근저당권자가 등기소에 함께 가거나, 근저당권자의 인감 날인 위임장과 인감증명서를 받아 소유자가 대리 접수해야 할 수 있습니다. 필요 서류는 등기소에 사전 확인하고, 차용증·설정계약서를 정확히 작성해두세요."
+            ]
+          }
+        }
+      },
+      {
+        id: "debtor-owner",
+        text: "대출을 받는 사람(채무자)과 부동산 소유자가 같은 사람인가요?",
+        helpText: "소유자가 아닌 다른 사람의 대출을 위해 내 부동산을 담보로 제공하는 것을 '물상보증'이라고 합니다.",
+        options: [
+          { value: "same", label: "예, 같은 사람입니다" },
+          { value: "different", label: "아니오, 채무자가 따로 있습니다 (물상보증)" }
+        ],
+        effects: {
+          same: {},
+          different: {
+            documents: [
+              { id: "debtor-info", label: "채무자 인적사항 자료(성명·주소·주민등록번호)", category: "creditor", note: "신청서의 채무자 표시에 소유자와 다른 사람으로 정확히 기재 — 근저당권설정계약서의 채무자 표기 기준" }
+            ],
+            warnings: [
+              "물상보증은 소유자가 남의 채무를 담보하는 것이라 채무자·채권최고액·담보 범위를 계약서에서 특히 꼼꼼히 확인하세요. 신청서에는 채무자를 소유자와 구분해 기재합니다."
+            ]
+          }
+        }
+      },
+      {
+        id: "owner-count",
+        text: "부동산 소유자(담보 제공자)는 몇 명인가요?",
+        options: [
+          { value: "single", label: "단독 명의" },
+          { value: "joint", label: "공동 명의 (2인 이상)" }
+        ],
+        effects: {
+          single: {},
+          joint: {
+            documents: [
+              { id: "co-owner-docs", label: "공동소유자 전원의 인감증명서·인감도장·등기필증·주민등록초본", category: "owner", note: "각 소유자가 자기 지분 등을 담보로 제공하므로 소유자 서류를 각자 준비 (3개월 이내)" }
+            ],
+            warnings: [
+              "공유물 전체에 근저당권을 설정하는지, 특정 지분에만 설정하는지에 따라 신청서 기재가 달라집니다. 은행의 담보 조건을 확인하세요."
+            ]
+          }
+        }
+      },
+      {
+        id: "address-match",
+        text: "등기부등본상 소유자 주소가 현재 주민등록 주소와 같은가요?",
+        helpText: "이사 이력이 있으면 등기부에는 옛 주소가 남아있는 경우가 많습니다. 등기부등본 갑구의 소유자 주소와 주민등록초본을 비교해보세요.",
+        options: [
+          { value: "same", label: "같습니다" },
+          { value: "different", label: "다릅니다 (또는 잘 모르겠습니다)" }
+        ],
+        effects: {
+          same: {},
+          different: {
+            documents: [
+              { id: "address-history", label: "주소 변동 이력이 나오는 주민등록초본", category: "owner", note: "등기부상 옛 주소부터 현재 주소까지의 이력이 모두 나오도록 발급 (3개월 이내)" }
+            ],
+            warnings: [
+              "등기부상 소유자 주소와 현재 주소가 다르면 등기소에서 등기명의인표시변경등기를 요구할 수 있습니다. 이 경우 과거 주소 이력이 나오는 초본이 필요하고, 별도로 등록면허세(정액 6,000원, 지방교육세를 더하면 7,200원 안팎 — 자료마다 달라 위택스 화면 기준으로 확인)와 등기신청수수료(e-Form 3,000원 안팎)가 듭니다. 표시변경을 근저당 설정과 같은 날 함께 접수할 수 있는지, 먼저 완료해야 하는지는 등기소에 미리 확인하세요."
             ]
           }
         }
@@ -1610,6 +1858,7 @@ const REGISTRATION_TYPES = [
 // 등기 유형별 시각 정체성(아이콘 · 강조색 · 배지) — DESIGN.md의 type-* 토큰과 짝을 이룬다.
 const TYPE_META = {
   "sale": { icon: "🏠", accent: "var(--type-sale)", accentBg: "var(--type-sale-c)", tag: { text: "가장 많이 찾는 유형", tone: "primary" } },
+  "mortgage-set": { icon: "🏦", accent: "var(--type-loan)", accentBg: "var(--type-loan-c)" },
   "mortgage-cancel": { icon: "🔓", accent: "var(--type-mortgage)", accentBg: "var(--type-mortgage-c)", tag: { text: "난이도 낮음", tone: "success" } },
   "jeonse-set": { icon: "📜", accent: "var(--type-jeonse)", accentBg: "var(--type-jeonse-c)" },
   "gift": { icon: "🎁", accent: "var(--type-gift)", accentBg: "var(--type-gift-c)" },
@@ -1730,6 +1979,16 @@ function calcBond(amount, region, kind) {
   return { rate, label: bracket.label, amount: roundBondAmount(Math.round(amount * rate / 1000)) };
 }
 
+// 근저당권 설정(대출) 비용: 등록면허세 = 채권최고액 × 0.2%(최저 6,000원), 지방교육세 = 등록면허세 × 20%,
+// 국민주택채권 = 설정금액 2천만원 이상일 때 설정금액의 1%(상한 10억원), 등기신청수수료 = e-Form 15,000원(부동산 1개 기준)
+function calcMortgageSet(ceiling) {
+  const licenseTax = Math.max(Math.floor(ceiling * 0.002), 6000);
+  const eduTax = Math.floor(licenseTax * 0.2);
+  const bondApplicable = ceiling >= 20000000;
+  const bond = bondApplicable ? roundBondAmount(Math.round(Math.min(ceiling * 0.01, 1000000000))) : 0;
+  return { licenseTax, eduTax, taxTotal: licenseTax + eduTax, bondApplicable, bond, regFee: 15000 };
+}
+
 // 인지세·국민주택채권 매입기준율표처럼 구간별 수치가 여러 개 나열되는 정보를 표로 렌더링한다
 function renderRateTable(t) {
   // t.wrap: true면 숫자 요율표 대신 절차 설명처럼 줄바꿈되는 왼쪽 정렬 텍스트 표로 렌더링한다.
@@ -1765,6 +2024,28 @@ function renderCalculator(calc) {
           </div>
         </div>
         <div class="dd-calc-result" id="calc-${id}-result">거래금액을 입력하면 결과가 여기 표시됩니다.</div>
+      </div>
+    `;
+  }
+  if (calc.kind === "mortgage-set") {
+    return `
+      <div class="dd-calc" data-calc-id="${id}" data-calc-kind="mortgage-set">
+        <div class="dd-calc-title">🧮 계산기 — 채권최고액을 입력하면 근저당 설정 비용을 바로 확인할 수 있어요</div>
+        <div class="dd-calc-row">
+          <label for="calc-${id}-amount">채권최고액</label>
+          <div class="dd-calc-input-wrap">
+            <input id="calc-${id}-amount" type="text" inputmode="numeric" placeholder="예: 120,000,000" class="dd-calc-input">
+            <span class="dd-calc-unit">원</span>
+          </div>
+        </div>
+        <div class="dd-calc-row">
+          <label for="calc-${id}-discount">채권 할인율</label>
+          <div class="dd-calc-input-wrap">
+            <input id="calc-${id}-discount" type="text" inputmode="decimal" placeholder="예: 15.5 (선택, 당일 조회값)" class="dd-calc-input">
+            <span class="dd-calc-unit">%</span>
+          </div>
+        </div>
+        <div class="dd-calc-result" id="calc-${id}-result">채권최고액을 입력하면 결과가 여기 표시됩니다.</div>
       </div>
     `;
   }
@@ -1805,11 +2086,40 @@ function wireCalculators(calculators) {
     const regionEl = document.getElementById(`calc-${id}-region`);
     const discountEl = document.getElementById(`calc-${id}-discount`);
     if (!amountEl || !resultEl) return;
-    const placeholder = calc.kind === "stamp" ? "거래금액을 입력하면 결과가 여기 표시됩니다." : "시가표준액을 입력하면 결과가 여기 표시됩니다.";
+    const placeholder = calc.kind === "stamp" ? "거래금액을 입력하면 결과가 여기 표시됩니다."
+      : calc.kind === "mortgage-set" ? "채권최고액을 입력하면 결과가 여기 표시됩니다."
+      : "시가표준액을 입력하면 결과가 여기 표시됩니다.";
     function update() {
       const digits = amountEl.value.replace(/[^0-9]/g, "");
       if (!digits) { resultEl.textContent = placeholder; return; }
       const amount = Number(digits);
+      if (calc.kind === "mortgage-set") {
+        const c = calcMortgageSet(amount);
+        const won = n => n.toLocaleString("ko-KR") + "원";
+        const discountRaw = discountEl ? discountEl.value.trim() : "";
+        const discountPct = discountRaw ? Number(discountRaw) : NaN;
+        const hasDiscount = discountRaw && Number.isFinite(discountPct) && discountPct > 0;
+        let bondLine;
+        let bondBurden = 0;
+        if (!c.bondApplicable) {
+          bondLine = "국민주택채권: 설정금액 2천만원 미만이라 매입 대상이 아님";
+        } else if (hasDiscount) {
+          bondBurden = Math.round(c.bond * discountPct / 100);
+          bondLine = `국민주택채권: 매입금액 ${won(c.bond)} (설정금액의 1%) → 즉시매도 시 고객부담금 ${won(bondBurden)} (할인율 ${discountPct}%)`;
+        } else {
+          bondLine = `국민주택채권: 매입금액 ${won(c.bond)} (설정금액의 1%) — 할인율(%)을 입력하면 실제 고객부담금이 계산됩니다`;
+        }
+        resultEl.innerHTML = `<b>${won(c.taxTotal + c.regFee + bondBurden)}</b>
+          <span class="dd-calc-sub">${hasDiscount || !c.bondApplicable ? "예상 총 실비용 (세금 + 수수료 + 채권 고객부담금)" : "세금 + 수수료 합계 (국민주택채권 고객부담금 별도)"}</span>
+          <ul class="dd-calc-lines">
+            <li>등록면허세: ${won(c.licenseTax)} (채권최고액의 0.2%, 최저 6,000원)</li>
+            <li>지방교육세: ${won(c.eduTax)} (등록면허세의 20%)</li>
+            <li>등기신청수수료: ${won(c.regFee)} (e-Form, 부동산 1개 기준)</li>
+            <li>${esc(bondLine)}</li>
+          </ul>
+          <span class="dd-calc-sub">실제 세액은 위택스 계산 화면, 수수료는 인터넷등기소 결제 화면 기준으로 최종 확인하세요. 은행이 세금·수수료를 부담하는 상품이면 본인 부담이 달라집니다.</span>`;
+        return;
+      }
       if (calc.kind === "stamp") {
         const b = calcStampDuty(amount);
         resultEl.innerHTML = `<b>${b.amount ? b.amount.toLocaleString("ko-KR") + "원" : "면제 (납부 대상 아님)"}</b><span class="dd-calc-sub">${esc(b.label)} 구간</span>`;
